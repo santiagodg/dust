@@ -31,8 +31,7 @@ Statement ::= LetStatement
 
 LetStatement ::= 'let' IDENTIFIER ':' Type ('=' Expression)? ';'
 
-ExpressionStatement ::= ExpressionWithoutBlock ';'
-                     | ExpressionWithBlock ';'
+ExpressionStatement ::= ( ExpressionWithoutBlock | ExpressionWithBlock ) ';'
 
 ExpressionWithoutBlock ::= LiteralExpression
                         | 'IDENTIFIER'
