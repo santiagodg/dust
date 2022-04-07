@@ -3,7 +3,7 @@ Crate ::= Item*
 Item ::= Function
       |  StaticItem
 
-Function ::= 'fn' IDENTIFIER '(' FunctionParameters? ')' FunctionReturnType? BlockExpression
+Function ::= 'fn' IDENTIFIER '(' FunctionParameters? ')' FunctionReturnType? LetStatement* BlockExpression
 
 FunctionParameters ::= FunctionParam (',' FunctionParam)* ','?
 
@@ -25,10 +25,9 @@ BlockExpression ::= '{' Statements? '}'
 
 Statements ::= Statement+
 
-Statement ::= LetStatement
-           | ExpressionStatement
+Statement ::= ExpressionStatement
 
-LetStatement ::= 'let' IDENTIFIER ':' Type ('=' Expression)? ';'
+LetStatement ::= 'let' IDENTIFIER ':' Type ';'
 
 ExpressionStatement ::= ( ExpressionWithoutBlock | ExpressionWithBlock ) ';'
 
