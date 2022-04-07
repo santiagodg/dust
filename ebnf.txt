@@ -16,7 +16,6 @@ PrimitiveType ::= 'bool'
                | 'i32'
                | 'f64'
                | 'char'
-               | 'str'
 
 ArrayType ::= '[' Type ';' Expression ']'
 
