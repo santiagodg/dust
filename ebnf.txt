@@ -42,9 +42,9 @@ ExpressionWithoutBlock ::= LiteralExpression
                         | ContinueExpression
                         | BreakExpression
                         | ReturnExpression
+                        | SpecialFunctionExpression
 
 LiteralExpression ::= 'CHAR_LITERAL'
-                   | 'STRING_LITERAL'
                    | 'INTEGER_LITERAL'
                    | 'FLOAT_LITERAL'
                    | 'BOOLEAN_LITERAL'
@@ -99,6 +99,57 @@ ContinueExpression ::= 'continue'
 BreakExpression ::= 'break'
 
 ReturnExpression ::= 'return' Expression?
+
+SpecialFunctionExpression ::= IoExpression
+                           | StatisticExpression
+
+IoExpression ::= ReadExpression
+              | WriteExpression
+
+ReadExpression ::= 'read' '(' Expression  ')'
+
+WriteExpression ::= 'write' '(' Expression  ')'
+
+StatisticExpression ::= PlotExpression
+                     | ScatterExpression
+                     | HistogramExpression
+                     | MeanExpression
+                     | MedianExpression
+
+PlotExpression ::= PlotI32Expresion
+                | PlotF64Expression
+
+PlotI32Expression ::= 'plot_i32' '(' Expression ',' Expression ')'
+
+PlotF64Expression ::= 'plot_f64' '(' Expression ',' Expression ')'
+
+ScatterExpression ::= ScatterI32Expresion
+                | ScatterF64Expression
+
+ScatterI32Expression ::= 'scatter_i32' '(' Expression ',' Expression ')'
+
+ScatterF64Expression ::= 'scatter_f64' '(' Expression ',' Expression ')'
+
+HistogramExpression ::= HistogramI32Expresion
+                | HistogramF64Expression
+
+HistogramI32Expression ::= 'histogram_i32' '(' Expression ')'
+
+HistogramF64Expression ::= 'histogram_f64' '(' Expression ')'
+
+MeanExpression ::= MeanI32Expresion
+                | MeanF64Expression
+
+MeanI32Expression ::= 'mean_i32' '(' Expression ')'
+
+MeanF64Expression ::= 'mean_f64' '(' Expression ')'
+
+MedianExpression ::= MedianI32Expresion
+                | MedianF64Expression
+
+MedianI32Expression ::= 'median_i32' '(' Expression ')'
+
+MedianF64Expression ::= 'median_f64' '(' Expression ')'
 
 ExpressionWithBlock ::= LoopExpression
                      | IfExpression
