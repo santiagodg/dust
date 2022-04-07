@@ -1,0 +1,120 @@
+Crate ::= Item*
+
+Item ::= Function
+      |  StaticItem
+
+Function ::= 'fn' IDENTIFIER '(' FunctionParameters? ')' FunctionReturnType? BlockExpression
+
+FunctionParameters ::= FunctionParam (',' FunctionParam)* ','?
+
+FunctionParam ::= 'IDENTIFIER' ':' Type
+
+Type ::= PrimitiveType
+      | ArrayType
+
+PrimitiveType ::= 'bool'
+               | 'i32'
+               | 'f64'
+               | 'char'
+               | 'str'
+
+ArrayType ::= '[' Type ';' Expression ']'
+
+FunctionReturnType ::= '->' Type
+
+BlockExpression ::= '{' Statements? '}'
+
+Statements ::= Statement+
+
+Statement ::= LetStatement
+           | ExpressionStatement
+
+LetStatement ::= 'let' IDENTIFIER ':' Type ('=' Expression)? ';'
+
+ExpressionStatement ::= ExpressionWithoutBlock ';'
+                     | ExpressionWithBlock ';'
+
+ExpressionWithoutBlock ::= LiteralExpression
+                        | 'IDENTIFIER'
+                        | OperatorExpression
+                        | GroupedExpression
+                        | ArrayExpression
+                        | IndexExpression
+                        | CallExpression
+                        | ContinueExpression
+                        | BreakExpression
+                        | ReturnExpression
+
+LiteralExpression ::= 'CHAR_LITERAL'
+                   | 'STRING_LITERAL'
+                   | 'INTEGER_LITERAL'
+                   | 'FLOAT_LITERAL'
+                   | 'BOOLEAN_LITERAL'
+
+OperatorExpression ::= NegationExpression
+                    | ArithmenticExpression
+                    | ComparisonExpression
+                    | BooleanExpression
+                    | TypeCastExpression
+                    | AssignmentExpression
+
+NegationExpression ::= '-' Expression
+                    | '!' Expression
+
+ArithmenticExpression ::= Expression '+' Expression
+                       | Expression '-' Expression
+                       | Expression '*' Expression
+                       | Expression '/' Expression
+                       | Expression '%' Expression
+
+ComparisonExpression ::= Expression '==' Expression
+                      | Expression '!=' Expression
+                      | Expression '>' Expression
+                      | Expression '<' Expression
+                      | Expression '>=' Expression
+                      | Expression '<=' Expression
+
+BooleanExpression ::= Expression '||' Expression
+                   | Expression '&&' Expression
+
+TypeCastExpression ::= Expression 'as' Type
+
+AssignmentExpression ::= Expression '=' Expression
+
+GroupedExpression ::= '(' Expression ')'
+
+ArrayExpression ::= '[' ArrayElements? ']'
+
+ArrayElements ::= Expression (',' Expression)* ','?
+               | Expression ';' Expression
+
+IndexExpression ::= Expression '[' Expression ']'
+
+CallExpression ::= read '(' CallParams? ')'
+                | write '(' CallParams? ')'
+                | Expression '(' CallParams? ')'
+
+CallParams ::= Expression (',' Expression)* ','?
+
+ContinueExpression ::= 'continue'
+
+BreakExpression ::= 'break'
+
+ReturnExpression ::= 'return' Expression?
+
+ExpressionWithBlock ::= LoopExpression
+                     | IfExpression
+
+LoopExpression ::= InfiniteLoopExpression
+                | PredicateLoopExpression
+
+InfiniteLoopExpression ::= 'loop' BlockExpression
+
+PredicateLoopExpression ::= 'while' Expression BlockExpression
+
+IfExpression ::= 'if' Expression BlockExpression ( 'else' ( BlockExpression | IfExpression ) )?
+
+StaticItem ::= 'static' 'IDENTIFIER' ':' Type ('=' Expression)? ';'
+
+Expression ::= ExpressionWithoutBlock
+            | ExpressionWithBlock
