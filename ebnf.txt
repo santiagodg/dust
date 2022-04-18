@@ -23,15 +23,11 @@ ArrayType ::= '[' ( PrimitiveType | '[' PrimitiveType ';' INTEGER_LITERAL ']' ) 
 
 FunctionReturnType ::= '->' Type
 
-BlockExpression ::= '{' Statements? '}'
+BlockExpression ::= '{' Statement* '}'
 
-Statements ::= Statement+
-
-Statement ::= ExpressionStatement
+Statement ::= Expression ';'
 
 LetStatement ::= 'let' IDENTIFIER ':' Type ';'
-
-ExpressionStatement ::= Expression ';'
 
 Expression ::= ExpressionWithoutBlock
             | ExpressionWithBlock
@@ -51,10 +47,10 @@ ExpressionWithoutBlock ::= LiteralExpression
 LiteralExpression ::= CHAR_LITERAL
                    | INTEGER_LITERAL
                    | FLOAT_LITERAL
-                   | BOOLEAN_LITERAL
+                   | BOOL_LITERAL
 
 OperatorExpression ::= NegationExpression
-                    | ArithmenticExpression
+                    | ArithmeticExpression
                     | ComparisonExpression
                     | BooleanExpression
                     | TypeCastExpression
@@ -63,7 +59,7 @@ OperatorExpression ::= NegationExpression
 NegationExpression ::= '-' Expression
                     | '!' Expression
 
-ArithmenticExpression ::= Expression '+' Expression
+ArithmeticExpression ::= Expression '+' Expression
                        | Expression '-' Expression
                        | Expression '*' Expression
                        | Expression '/' Expression
@@ -104,7 +100,6 @@ ReturnExpression ::= 'return' Expression?
 
 SpecialFunctionExpression ::= IoExpression
                            | StatisticExpression
-                           | UtilityExpression
 
 IoExpression ::= ReadExpression
               | WriteExpression
