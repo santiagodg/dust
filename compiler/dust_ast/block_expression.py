@@ -22,5 +22,8 @@ class BlockExpression:
 
         return result
     
-    def __eq__(self, other) : 
+    def __eq__(self, other):
+        if other == None:
+            return False
+
         return self.__dict__ == other.__dict__

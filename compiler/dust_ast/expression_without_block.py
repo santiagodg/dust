@@ -32,8 +32,13 @@ class ExpressionWithoutBlock:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'ExpressionWithoutBlock:\n'
-        expression_str: str = self.__expression.to_string(indent, padding + indent)
-        result += f'{space_padding}{space_indent}expression: {expression_str}'
+
+        if isinstance(self.__expression, str):
+            result += f"{space_padding}{space_indent}expression: '{self.__expression}'"
+        else:
+            expression_str: str = self.__expression.to_string(indent, padding + indent)
+            result += f'{space_padding}{space_indent}expression: {expression_str}'
+
         return result
 
     def __eq__(self, other) : 

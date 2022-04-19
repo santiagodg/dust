@@ -25,7 +25,7 @@ class Function:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'Function:\n'
-        result += f'{space_padding}{space_indent}identifier: {self.__identifier}\n'
+        result += f"{space_padding}{space_indent}identifier: '{self.__identifier}'\n"
 
         if len(self.__parameters) == 0:
             result += f'{space_padding}{space_indent}parameters: []\n'
@@ -38,7 +38,9 @@ class Function:
             
             result += f'{space_padding}{space_indent}]\n'
         
-        if self.__return_type != None:
+        if self.__return_type == None:
+            result += f'{space_padding}{space_indent}return_type: None\n'
+        else:
             return_type_str: str = self.__return_type.to_string(indent, padding + indent)
             result += f'{space_padding}{space_indent}return_type: {return_type_str}\n'
         
@@ -57,5 +59,5 @@ class Function:
         result += f'{space_padding}{space_indent}block: {block_str}'
         return result
     
-    def __eq__(self, other) : 
+    def __eq__(self, other): 
         return self.__dict__ == other.__dict__
