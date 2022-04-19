@@ -1,5 +1,6 @@
 class ArrayExpression:
     def __init__(self, array_elements):
+        "array_elements: list[Expression]"
         self.__array_elements = array_elements
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
@@ -15,7 +16,7 @@ class ArrayExpression:
 
             for array_element in self.__array_elements:
                 array_element_str: str = array_element.to_string(indent, padding + indent * 2)
-                result += f'{space_padding}{space_indent}{space_indent}{array_element}\n'
+                result += f'{space_padding}{space_indent}{space_indent}{array_element_str}\n'
             
             result += f'{space_padding}{space_indent}]'
         

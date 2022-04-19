@@ -7,7 +7,7 @@ class PrimitiveType:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'PrimitiveType:\n'
-        result += f'{space_padding}{space_indent}type: {self.__type}'
+        result += f"{space_padding}{space_indent}type: '{self.__type}'"
         return result
     
     def __eq__(self, other) : 

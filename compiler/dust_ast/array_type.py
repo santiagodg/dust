@@ -1,5 +1,10 @@
 class ArrayType:
     def __init__(self, type, length: int):
+        """
+        type: Type
+        length: int
+        """
+        
         self.__type = type
         self.__length: int = length
     

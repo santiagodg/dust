@@ -10,7 +10,7 @@ class StaticItem:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'StaticItem:\n'
-        result += f'{space_padding}{space_indent}identifier: {self.__identifier}\n'
+        result += f"{space_padding}{space_indent}identifier: '{self.__identifier}'\n"
         type_str: str = self.__type.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}type: {type_str}'
         return result

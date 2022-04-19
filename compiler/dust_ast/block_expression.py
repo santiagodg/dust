@@ -1,5 +1,6 @@
 class BlockExpression:
     def __init__(self, statements):
+        "statements: list[Statement]"
         self.__statements = statements
     
     def to_string(self, indent: int = 2, padding: int = 0) -> str:

@@ -1,5 +1,10 @@
 class AssignmentExpression:
     def __init__(self, left_expression, right_expression):
+        """
+        left_expression: Expression
+        right_expression: Expression
+        """
+        
         self.__left_expression = left_expression
         self.__right_expression = right_expression
 

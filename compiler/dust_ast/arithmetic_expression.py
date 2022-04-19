@@ -1,7 +1,11 @@
-from .expression import Expression
-
 class ArithmeticExpression:
     def __init__(self, left_expression, operator: str, right_expression):
+        """
+        left_expression: Expression
+        operator: str
+        right_expression: Expression
+        """
+        
         self.__left_expression = left_expression
         self.__operator = operator
         self.__right_expression = right_expression

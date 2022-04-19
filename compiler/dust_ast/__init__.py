@@ -43,6 +43,7 @@ from .skewness_expression import SkewnessExpression
 from .kurtosis_expression import KurtosisExpression
 from .r_squared_expression import RSquaredExpression
 from .sum_expression import SumExpression
+from .loop_expression import LoopExpression
 from .infinite_loop_expression import InfiniteLoopExpression
 from .predicate_loop_expression import PredicateLoopExpression
 from .if_expression import IfExpression
