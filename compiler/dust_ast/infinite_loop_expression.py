@@ -1,0 +1,17 @@
+from .block_expression import BlockExpression
+
+class InfiniteLoopExpression:
+    def __init__(self, block: BlockExpression):
+        self.__block: BlockExpression = block
+
+    def to_string(self, indent: int = 2, padding: int = 0) -> str:
+        result: str = ''
+        space_padding: str = ' ' * padding
+        space_indent: str = ' ' * indent
+        result += f'InfiniteLoopExpression:\n'
+        block_str: str = self.__block.to_string(indent, padding + indent)
+        result += f'{space_padding}{space_indent}block: {block_str}'
+        return result
+
+    def __eq__(self, other) : 
+        return self.__dict__ == other.__dict__
