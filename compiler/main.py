@@ -1,11 +1,9 @@
-import lexer
-import parser
+from lexer import Lexer
+from parser import Parser
+from compiler import Compiler
 
-l = lexer.Lexer()
-l.build()
-
-p = parser.Parser()
-p.build(l.lexer)
-
-result = p.test("fn main() { }")
-print(result)
+l = Lexer()
+p = Parser(l)
+c = Compiler(p)
+result = c.test("")
+print(result.to_string())

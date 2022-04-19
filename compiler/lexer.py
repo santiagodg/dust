@@ -102,7 +102,7 @@ class Lexer:
         print("Illegal character '%s'" % t.value[0])
         t.lexer.skip(1)
 
-    def build(self, **kwargs):
+    def __init__(self, **kwargs):
         self.lexer = lex.lex(module=self, **kwargs)
     
     def test(self, data):

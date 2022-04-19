@@ -1,6 +1,7 @@
 import ply.yacc as yacc
 
 import lexer
+from dust_ast import Crate, Item, StaticItem, Function, FunctionParameter, LetStatement, BlockExpression, Type
 
 class Parser():
     tokens = lexer.Lexer().tokens
@@ -18,43 +19,55 @@ class Parser():
 
     def p_crate(self, p):
         '''crate : crate item
-                 | item'''
+                 | empty'''
 
         if len(p) == 2:
-            p[0] = ('crate', [p[1]])
+            p[0] = Crate([])
         else:
-            p[0] = ('crate', p[1][1] + [p[2]])
+            p[1].add_item(p[2])
+            p[0] = p[1]
 
     def p_item(self, p):
-        '''item : static_item
-                | function'''
-        
-        p[0] = ('item', p[1])
+        """item : static_item
+                | function"""
+        p[0] = Item(p[1])
     
     def p_static_item(self, p):
         "static_item : STATIC IDENTIFIER ':' type ';'"
-        p[0] = ('static_item', p[2], p[4])
+        p[0] = StaticItem(p[2], p[4])
     
     def p_function(self, p):
         """function : FN IDENTIFIER '(' function_parameters ')' function_return_type let_statements block_expression
                     | FN IDENTIFIER '(' function_parameters ')'        empty         let_statements block_expression"""
-        p[0] = ('function', p[2], p[4], p[6], p[7], p[8])
+        p[0] = Function(p[2], p[4], p[6], p[7], p[8])
     
-    def p_function_parameters(self, p):
-        """function_parameters : function_parameters function_param ','
-                               | empty"""
+    def p_function_parameters_0(self, p):
+        """function_parameters : empty
+                               | function_param function_parameters_1"""
         
         if len(p) == 2:
-            p[0] = ('function_parameters', [])
+            p[0] = []
         else:
-            p[0] = ('function_parameters', p[1][1] + [p[2]])
+            p[0] = [p[1]] + p[2]
+    
+    def p_function_parameters_1(self, p):
+        """function_parameters_1 : ',' function_param function_parameters_1
+                                 | ','
+                                 | empty"""
+        
+        if len(p) == 4:
+            p[0] = [p[2]] + p[3]
+        else:
+            p[0] = []
+
 
     def p_function_param(self, p):
         "function_param : IDENTIFIER ':' type"
-        p[0] = ('function_param', p[1], p[3])
+        p[0] = FunctionParameter('function_param', p[1], p[3])
     
     def p_function_return_type(self, p):
         "function_return_type : RIGHT_ARROW type"
+        p[0] = Type(p[2])
 
     def p_statements(self, p):
         """statements : statements statement
@@ -74,13 +87,13 @@ class Parser():
                         | empty"""
         
         if len(p) == 2:
-            p[0] = ('let_statements', [])
+            p[0] = []
         else:
-            p[0] = ('let_statements', p[1][1] + [p[2]])
+            p[0] = p[1] + [p[2]]
 
     def p_let_statament(self, p):
         "let_statement : LET IDENTIFIER ':' type ';'"
-        p[0] = ('let_statement', p[2], p[4])
+        p[0] = LetStatement('let_statement', p[2], p[4])
     
     def p_expression(self, p):
         """expression : expression_without_block
@@ -119,7 +132,7 @@ class Parser():
     
     def p_block_expression(self, p):
         "block_expression : '{' statements '}'"
-        p[0] = ('block_expression', p[2])
+        p[0] = BlockExpression(('block_expression', p[2]))
     
     def p_operator_expression(self, p):
         """operator_expression : negation_expression
@@ -347,7 +360,7 @@ class Parser():
         """type : primitive_type
                 | array_type"""
         
-        p[0] = ('type', p[1])
+        p[0] = Type(('type', p[1]))
     
     def p_primitive_type(self, p):
         """primitive_type : BOOL
@@ -368,16 +381,16 @@ class Parser():
 
     def p_empty(self, p):
         'empty :'
-        p[0] = ('empty')
+        p[0] = None
     
     def p_error(self, p):
         print("Syntax error in input!")
         print(p)
     
-    def build(self, lexer, **kwargs):
+    def __init__(self, lexer, **kwargs):
         self.lexer = lexer
         self.parser = yacc.yacc(module=self, **kwargs)
     
     def test(self, data):
-        return self.parser.parse(data, lexer=self.lexer)
+        return self.parser.parse(data, lexer=self.lexer.lexer)
 
