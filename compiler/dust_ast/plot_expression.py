@@ -1,5 +1,10 @@
 class PlotExpression:
     def __init__(self, expression_0, expression_1):
+        """
+        expression_0: Expression
+        expression_1: Expression
+        """
+        
         self.__expression_0 = expression_0
         self.__expression_1 = expression_1
 

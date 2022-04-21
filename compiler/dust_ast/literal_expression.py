@@ -7,7 +7,12 @@ class LiteralExpression:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'LiteralExpression:\n'
-        result += f'{space_padding}{space_indent}literal: {self.__literal}'
+
+        if isinstance(self.__literal, str):
+            result += f"{space_padding}{space_indent}literal: '{self.__literal}'"    
+        else:
+            result += f'{space_padding}{space_indent}literal: {self.__literal}'
+
         return result
 
     def __eq__(self, other) : 

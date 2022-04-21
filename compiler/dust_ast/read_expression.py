@@ -9,8 +9,13 @@ class ReadExpression:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'ReadExpression:\n'
-        variable_str: str = self.__variable.to_string(indent, padding + indent)
-        result += f'{space_padding}{space_indent}variable: {variable_str}'
+
+        if isinstance(self.__variable, str):
+            result += f"{space_padding}{space_indent}variable: '{self.__variable}'"    
+        else:
+            variable_str: str = self.__variable.to_string(indent, padding + indent)
+            result += f'{space_padding}{space_indent}variable: {variable_str}'
+
         return result
 
     def __eq__(self, other) : 

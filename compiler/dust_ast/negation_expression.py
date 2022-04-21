@@ -1,5 +1,10 @@
 class NegationExpression:
     def __init__(self, operator: str, expression):
+        """
+        operator: str
+        expression: Expression
+        """
+        
         self.__operator = operator
         self.__expression = expression
 

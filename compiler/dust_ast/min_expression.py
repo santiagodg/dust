@@ -1,5 +1,6 @@
 class MinExpression:
     def __init__(self, expression):
+        "expression: Expression"
         self.__expression = expression
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:

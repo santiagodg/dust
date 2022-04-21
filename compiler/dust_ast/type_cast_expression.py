@@ -2,6 +2,11 @@ from .dust_type import Type
 
 class TypeCastExpression:
     def __init__(self, expression, type: Type):
+        """
+        expression: Expression
+        type: Type
+        """
+        
         self.__expression = expression
         self.__type = type
 
