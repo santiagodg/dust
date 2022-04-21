@@ -4,17 +4,18 @@ from .function_parameter import FunctionParameter
 from .dust_type import Type
 from .let_statement import LetStatement
 from .block_expression import BlockExpression
+from .identifier import Identifier
 
 class Function:
     def __init__(
         self, 
-        identifier: str, 
+        identifier: Identifier, 
         parameters: list[FunctionParameter], 
         return_type: Optional[Type], 
         let_statements: list[LetStatement], 
         block: BlockExpression):
 
-        self.__identifier: str = identifier
+        self.__identifier: Identifier = identifier
         self.__parameters: list[FunctionParameter] = parameters
         self.__return_type: Optional[Type] = return_type
         self.__let_statements: list[LetStatement] = let_statements
@@ -25,7 +26,8 @@ class Function:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'Function:\n'
-        result += f"{space_padding}{space_indent}identifier: '{self.__identifier}'\n"
+        identifier_str = self.__identifier.to_string(indent, padding + indent)
+        result += f"{space_padding}{space_indent}identifier: {identifier_str}\n"
 
         if len(self.__parameters) == 0:
             result += f'{space_padding}{space_indent}parameters: []\n'

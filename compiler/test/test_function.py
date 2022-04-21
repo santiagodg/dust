@@ -4,7 +4,7 @@ from dust_ast import *
 
 class TestFunction(unittest.TestCase):
     def test_to_string_empty(self):
-        identifier = 'id1'
+        identifier = Identifier('id1')
         parameters = []
         return_type = None
         let_statements = []
@@ -13,7 +13,7 @@ class TestFunction(unittest.TestCase):
         result = function.to_string()
 
         expected = f"""Function:
-  identifier: '{identifier}'
+  identifier: {identifier.to_string(2, 2)}
   parameters: []
   return_type: None
   let_statements: []
@@ -22,7 +22,7 @@ class TestFunction(unittest.TestCase):
         self.assertEqual(result, expected)
     
     def test_to_string_with_data(self):
-        identifier = 'id1'
+        identifier = Identifier('id1')
         parameters = [FunctionParameter('id2', Type(PrimitiveType('bool')))]
         return_type = Type(PrimitiveType('bool'))
         let_statements = [LetStatement('id3', Type(PrimitiveType('bool')))]
@@ -32,7 +32,7 @@ class TestFunction(unittest.TestCase):
         separator = "    \n"
 
         expected = f"""Function:
-  identifier: '{identifier}'
+  identifier: {identifier.to_string(2, 2)}
   parameters: [
     {separator.join([parameter.to_string(2, 4) for parameter in parameters])}
   ]
