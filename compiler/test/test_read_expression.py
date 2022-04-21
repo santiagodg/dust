@@ -16,7 +16,7 @@ class TestReadExpression(unittest.TestCase):
         self.assertEqual(result, expected)
     
     def test_to_string_with_index_expression(self):
-        index_expression = IndexExpression(Expression(ExpressionWithoutBlock('id1')), ExpressionWithoutBlock(LiteralExpression(0)))
+        index_expression = IndexExpression(Expression(ExpressionWithoutBlock(Identifier('id1'))), ExpressionWithoutBlock(LiteralExpression(0)))
         read_expression = ReadExpression(index_expression)
         result = read_expression.to_string()
 

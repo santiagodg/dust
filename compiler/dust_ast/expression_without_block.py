@@ -8,12 +8,13 @@ from .continue_expression import ContinueExpression
 from .break_expression import BreakExpression
 from .return_expression import ReturnExpression
 from .special_function_expression import SpecialFunctionExpression
+from .identifier import Identifier
 
 class ExpressionWithoutBlock:
     def __init__(
         self, 
         expression: LiteralExpression 
-            | str
+            | Identifier
             | OperatorExpression
             | GroupedExpression
             | ArrayExpression
@@ -33,11 +34,8 @@ class ExpressionWithoutBlock:
         space_indent: str = ' ' * indent
         result += f'ExpressionWithoutBlock:\n'
 
-        if isinstance(self.__expression, str):
-            result += f"{space_padding}{space_indent}expression: '{self.__expression}'"
-        else:
-            expression_str: str = self.__expression.to_string(indent, padding + indent)
-            result += f'{space_padding}{space_indent}expression: {expression_str}'
+        expression_str: str = self.__expression.to_string(indent, padding + indent)
+        result += f'{space_padding}{space_indent}expression: {expression_str}'
 
         return result
 

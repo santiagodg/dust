@@ -4,7 +4,7 @@ from dust_ast import *
 
 class TestIndexExpression(unittest.TestCase):
     def test_to_string(self):
-        left_expression = Expression(ExpressionWithoutBlock('id1'))
+        left_expression = Expression(ExpressionWithoutBlock(Identifier('id1')))
         right_expression = Expression(ExpressionWithoutBlock(LiteralExpression(0)))
         index_expression = IndexExpression(left_expression, right_expression)
         result = index_expression.to_string()
