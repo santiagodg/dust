@@ -54,3 +54,4 @@ from .array_type import ArrayType
 from .identifier import Identifier
 from .char_literal import CharLiteral
 from .integer_literal import IntegerLiteral
+from .float_literal import FloatLiteral
