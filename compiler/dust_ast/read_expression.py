@@ -1,8 +1,9 @@
 from .index_expression import IndexExpression
+from .identifier import Identifier
 
 class ReadExpression:
-    def __init__(self, variable: str | IndexExpression):
-        self.__variable: str | IndexExpression = variable
+    def __init__(self, variable: Identifier | IndexExpression):
+        self.__variable: Identifier | IndexExpression = variable
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -10,11 +11,8 @@ class ReadExpression:
         space_indent: str = ' ' * indent
         result += f'ReadExpression:\n'
 
-        if isinstance(self.__variable, str):
-            result += f"{space_padding}{space_indent}variable: '{self.__variable}'"    
-        else:
-            variable_str: str = self.__variable.to_string(indent, padding + indent)
-            result += f'{space_padding}{space_indent}variable: {variable_str}'
+        variable_str: str = self.__variable.to_string(indent, padding + indent)
+        result += f'{space_padding}{space_indent}variable: {variable_str}'
 
         return result
 
