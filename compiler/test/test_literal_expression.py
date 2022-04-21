@@ -4,12 +4,12 @@ from dust_ast import *
 
 class TestLiteralExpression(unittest.TestCase):
     def test_to_string_with_literal_char(self):
-        char_literal = 'A'
+        char_literal = CharLiteral('A')
         literal_expression = LiteralExpression(char_literal)
         result = literal_expression.to_string()
 
         expected = f"""LiteralExpression:
-  literal: '{char_literal}'"""
+  literal: {char_literal.to_string(2, 2)}"""
 
         self.assertEqual(result, expected)
     

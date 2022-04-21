@@ -1,6 +1,8 @@
+from .char_literal import CharLiteral
+
 class LiteralExpression:
-    def __init__(self, literal: str | int | float | bool):
-        self.__literal: str | int | float | bool = literal
+    def __init__(self, literal: CharLiteral | int | float | bool):
+        self.__literal: CharLiteral | int | float | bool = literal
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -8,8 +10,9 @@ class LiteralExpression:
         space_indent: str = ' ' * indent
         result += f'LiteralExpression:\n'
 
-        if isinstance(self.__literal, str):
-            result += f"{space_padding}{space_indent}literal: '{self.__literal}'"    
+        if isinstance(self.__literal, CharLiteral):
+            literal_str = self.__literal.to_string(indent, padding + indent)
+            result += f"{space_padding}{space_indent}literal: {literal_str}"    
         else:
             result += f'{space_padding}{space_indent}literal: {self.__literal}'
 
