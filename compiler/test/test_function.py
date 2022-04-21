@@ -23,7 +23,7 @@ class TestFunction(unittest.TestCase):
     
     def test_to_string_with_data(self):
         identifier = Identifier('id1')
-        parameters = [FunctionParameter('id2', Type(PrimitiveType('bool')))]
+        parameters = [FunctionParameter(Identifier('id2'), Type(PrimitiveType('bool')))]
         return_type = Type(PrimitiveType('bool'))
         let_statements = [LetStatement('id3', Type(PrimitiveType('bool')))]
         block_expression = BlockExpression([])
