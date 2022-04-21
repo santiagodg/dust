@@ -25,7 +25,7 @@ class TestFunction(unittest.TestCase):
         identifier = Identifier('id1')
         parameters = [FunctionParameter(Identifier('id2'), Type(PrimitiveType('bool')))]
         return_type = Type(PrimitiveType('bool'))
-        let_statements = [LetStatement('id3', Type(PrimitiveType('bool')))]
+        let_statements = [LetStatement(Identifier('id3'), Type(PrimitiveType('bool')))]
         block_expression = BlockExpression([])
         function = Function(identifier, parameters, return_type, let_statements, block_expression)
         result = function.to_string()
