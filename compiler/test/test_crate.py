@@ -14,7 +14,7 @@ class TestCrate(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_to_string_with_items(self):
-        items = [Item(StaticItem('id1', Type(PrimitiveType('bool'))))]
+        items = [Item(StaticItem(Identifier('id1'), Type(PrimitiveType('bool'))))]
         crate = Crate(items)
         result = crate.to_string()
         separator = "    \n"
