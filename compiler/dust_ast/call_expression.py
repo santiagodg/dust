@@ -1,7 +1,9 @@
+from .identifier import Identifier
+
 class CallExpression:
-    def __init__(self, identifier: str, call_params):
+    def __init__(self, identifier: Identifier, call_params):
         """
-        identifier: str
+        identifier: Identifier
         call_params: list[Expression]
         """
 
@@ -13,7 +15,8 @@ class CallExpression:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'CallExpression:\n'
-        result += f"{space_padding}{space_indent}identifier: '{self.__identifier}'\n"
+        identifier_str: str = self.__identifier.to_string(indent, padding + indent)
+        result += f"{space_padding}{space_indent}identifier: {identifier_str}\n"
 
         if len(self.__call_params) == 0:
             result += f'{space_padding}{space_indent}call_params: []'
