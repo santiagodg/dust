@@ -52,3 +52,4 @@ from .primitive_type import PrimitiveType
 from .array_type import ArrayType
 
 from .identifier import Identifier
+from .char_literal import CharLiteral
