@@ -21,7 +21,7 @@ PrimitiveType ::= 'bool'
 
 ArrayType ::= '[' ( PrimitiveType | '[' PrimitiveType ';' INTEGER_LITERAL ']' ) ';' INTEGER_LITERAL ']'
 
-FunctionReturnType ::= '->' Type
+FunctionReturnType ::= '->' PrimitiveType
 
 BlockExpression ::= '{' Statement* '}'
 

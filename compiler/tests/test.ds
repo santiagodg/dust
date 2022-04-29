@@ -1,0 +1,288 @@
+static global_bool: bool;
+static global_i32: i32;
+static global_f64: f64;
+static global_char: char;
+static global_bool_array: [bool; 3];
+static global_i32_array: [i32; 3];
+static global_f64_array: [f64; 3];
+static global_char_array: [char; 3];
+static global_bool_matrix: [[bool; 3]; 3]
+static global_i32_matrix: [[i32; 3]; 3]
+static global_f64_matrix: [[f64; 3]; 3]
+static global_char_matrix: [[char; 3]; 3]
+
+fn test_trivial_function() {}
+
+fn test_function_with_elements(a: i32) -> i32
+let b: i32;
+{
+    b = a + 1;
+    return true;
+}
+
+fn test_boolean_negation_expression() -> bool
+let input: bool;
+let result: bool;
+let expected: bool;
+{
+    input = true;
+    result = !true;
+    expected = false;
+    return result == expected;
+}
+
+fn test_integer_negation_expression() -> bool
+let input: i32;
+let result: i32;
+let expected: i32;
+{
+    input = 1;
+    result = -input;
+    expected = -1;
+    return result == expected;
+}
+
+fn test_floating_negation_expression() -> bool
+let input: f64;
+let result: f64;
+let expected: f64;
+{
+    input = 1.0;
+    result = -input;
+    expected = -1.0;
+    return result == expected;
+}
+
+fn test_integer_adding_expression() -> bool
+let input: i32;
+let result: i32;
+let expected: i32;
+{
+    input = 1;
+    result = input + 1;
+    expected = 2;
+    return result == expected;
+}
+
+fn test_floating_adding_expression() -> bool
+let input: f64;
+let result: f64;
+let expected: f64;
+{
+    input = 1.0;
+    result = input + 1.0;
+    expected = 2.0;
+    return result == expected;
+}
+
+fn test_integer_subtraction_expression() -> bool
+let input: i32;
+let result: i32;
+let expected: i32;
+{
+    input = 2;
+    result = input - 1;
+    expected = 1;
+    return result == expected;
+}
+
+fn test_floating_subtraction_expression() -> bool
+let input: f64;
+let result: f64;
+let expected: f64;
+{
+    input = 2.0;
+    result = input - 1.0;
+    expected = 1.0;
+    return result == expected;
+}
+
+fn test_integer_multiplication_expression() -> bool
+let input: i32;
+let result: i32;
+let expected: i32;
+{
+    input = 2;
+    result = input * 2;
+    expected = 4;
+    return result == expected;
+}
+
+fn test_floating_multiplication_expression() -> bool
+let input: f64;
+let result: f64;
+let expected: f64;
+{
+    input = 2.0;
+    result = input * 2.0;
+    expected = 2.0;
+    return result == expected;
+}
+
+fn test_integer_division_expression() -> bool
+let input: i32;
+let result: i32;
+let expected: i32;
+{
+    input = 5;
+    result = input / 2;
+    expected = 2;
+    return result == expected;
+}
+
+fn test_floating_division_expression() -> bool
+let input: f64;
+let result: f64;
+let expected: f64;
+{
+    input = 5.0;
+    result = input / 2.0;
+    expected = 2.5;
+    return result == expected;
+}
+
+fn test_modulus_expression() -> bool
+let input: i32;
+let result: i32;
+let expected: i32;
+{
+    input = 5;
+    result = input % 3;
+    expected = 2;
+    return result == expected;
+}
+
+fn test_boolean_equals_expression() -> bool
+let input: bool;
+let result: bool;
+let expected: bool;
+{
+    input = True;
+    result = input == True;
+    expected = True;
+    return result == expected;
+}
+
+fn test_integer_equals_expression() -> bool
+let input: i32;
+let result: i32;
+let expected: bool;
+{
+    input = 333;
+    result = input == 333;
+    expected = True;
+    return result == expected;
+}
+
+fn test_floating_equals_expression() -> bool
+let input: f64;
+let result: f64;
+let expected: bool;
+{
+    input = 32.0;
+    result = input == 99.0;
+    expected = False;
+    return result == expected;
+}
+
+fn test_char_equals_expression() -> bool
+let input: char;
+let result: char;
+let expected: bool;
+{
+    input = 'a';
+    result = input == 'b';
+    expected = False;
+    return result == expected;
+}
+
+fn test_boolean_not_equals_expression() -> bool
+let input: bool;
+let result: bool;
+let expected: bool;
+{
+    input = True;
+    result = input != True;
+    expected = False;
+    return result == expected;
+}
+
+fn test_integer_not_equals_expression() -> bool
+let input: i32;
+let result: i32;
+let expected: bool;
+{
+    input = 333;
+    result = input != 333;
+    expected = False;
+    return result == expected;
+}
+
+fn test_floating_not_equals_expression() -> bool
+let input: f64;
+let result: f64;
+let expected: bool;
+{
+    input = 32.0;
+    result = input != 99.0;
+    expected = True;
+    return result == expected;
+}
+
+fn test_char_not_equals_expression() -> bool
+let input: char;
+let result: char;
+let expected: bool;
+{
+    input = 'a';
+    result = input != 'b';
+    expected = True;
+    return result == expected;
+}
+
+fn test_integer_more_than_expression() -> bool
+let input: i32;
+let result: i32;
+let expected: bool;
+{
+    input = 555;
+    result = input > 333;
+    expected = True;
+    return result == expected;
+}
+
+fn test_floating_more_than_expression() -> bool
+let input: f64;
+let result: f64;
+let expected: bool;
+{
+    input = 99.0;
+    result = input > 32.0;
+    expected = True;
+    return result == expected;
+}
+
+fn test_char_more_than_expression() -> bool
+let input: char;
+let result: char;
+let expected: bool;
+{
+    input = 'a';
+    result = input > 'b';
+    expected = True;
+    return result == expected;
+}
+
+fn main() {
+    test_trivial_function();
+    test_function_with_elements(1);
+    test_boolean_negation_expression();
+    test_integer_negation_expression();
+    test_floating_negation_expression();
+    test_integer_adding_expression();
+    test_floating_adding_expression();
+    test_integer_subtraction_expression();
+    test_floating_subtraction_expression();
+    test_integer_multiplication_expression();
+    test_floating_multiplication_expression();
+}
