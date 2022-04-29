@@ -74,6 +74,8 @@ def run():
         c = Compiler(p)
         result = c.test(tc.input)
 
+        p.restart()
+
         if result == tc.expected:
             print(f'{tc.name}: PASSED')
             continue

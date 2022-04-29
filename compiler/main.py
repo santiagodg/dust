@@ -11,7 +11,7 @@ static global_1: bool;
 
 fn main()
 let local_1: i32;
-let local_1: i32;
+let local_2: i32;
 {
     global_1 = true;
     local_1 = 2;

@@ -60,6 +60,7 @@ class Parser():
     
     def p_function_check_id(self, p):
         "function_check_id : "
+        # print(f"Calling DirFunc.exists for identifier {p[-1]}")
 
         if self.__dir_func.exists(p[-1]):
             print(f"Multiple declaration: function '{p[-1].identifier()}' in line {self.lexer.lexer.lineno}")
@@ -467,5 +468,18 @@ class Parser():
         self.__temp_function_identifier = None
         self.parser = yacc.yacc(module=self, **kwargs)
     
-    def test(self, data):
+    def restart(self):
+        self.parser.restart()
+    
+    def test(self, data: str) -> Crate:
+        """
+        Parses an input string and returns the abstract syntax tree.
+
+        Panics if it encounters an error. Writes to stdout an error message
+        befor exiting.
+
+        :param data: str. The input to parse.
+        :return: Crate. The abstract syntax tree.
+        """
+
         return self.parser.parse(data, lexer=self.lexer.lexer)

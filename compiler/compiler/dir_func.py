@@ -39,11 +39,17 @@ class Variable:
         return result
 
 class FunctionEntry:
-    def __init__(self, identifier: Identifier):
+    def __init__(
+            self,
+            identifier: Identifier,
+            parameters: dict[str, list[FunctionParameter]] = {},
+            return_type: Optional[PrimitiveType] = None,
+            let_statements: dict[str, LetStatement] = {}):
+
         self.__identifier = identifier
-        self.__parameters = {}
-        self.__return_type = None
-        self.__let_statements = {}
+        self.__parameters = parameters
+        self.__return_type = return_type
+        self.__let_statements = let_statements
     
     def exists_identifier(self, variable_identifier: Identifier) -> bool:
         return variable_identifier.identifier() in self.__parameters.keys() ^ self.__let_statements.keys()
@@ -77,9 +83,9 @@ class FunctionEntry:
         return result
 
 class DirFunc:
-    def __init__(self):
-        self.__static_items: dict[str, StaticItem] = {}
-        self.__functions: dict[str, FunctionEntry] = {}
+    def __init__(self, static_items: dict[str, StaticItem] = {}, functions: dict[str, FunctionEntry] = {}):
+        self.__static_items = static_items
+        self.__functions = functions
 
     def add_static_item(self, static_item: StaticItem) -> Optional[DirFuncError]:
         identifier_str = static_item.identifier().identifier()
@@ -94,6 +100,7 @@ class DirFunc:
         return None
     
     def add_function_identifier(self, identifier: Identifier):
+        # print(f"Called DirFunc.add_function_identifier with identifier {identifier}")
         self.__functions[identifier.identifier()] = FunctionEntry(identifier)
     
     def add_function_parameter(self, function_identifier: Identifier, function_parameter: FunctionParameter):
@@ -121,7 +128,8 @@ class DirFunc:
         return None
 
     def exists(self, identifier: Identifier) -> bool:
-        return identifier.identifier() in self.__functions.keys() ^ self.__static_items.keys()
+        # print(self.__functions.keys() ^ self.__static_items.keys())
+        return identifier.identifier() in (self.__functions.keys() ^ self.__static_items.keys())
 
     def __repr__(self):
         return self.__str__()
@@ -135,3 +143,9 @@ class DirFunc:
         result += ','.join(attr_str)
         result += ')'
         return result
+    
+    def __eq__(self, other):
+        if not isinstance(other, DirFunc):
+            return False
+
+        return self.__dict__ == other.__dict__

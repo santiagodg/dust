@@ -1,18 +1,25 @@
 from compiler import Lexer, Parser, Compiler, DirFunc
 from compiler.dust_ast import *
 
-l = Lexer()
-dir_func = DirFunc()
-p = Parser(l, dir_func)
-c = Compiler(p)
-
 def test_compiler_empty_crate():
+    l = Lexer()
+    dir_func = DirFunc()
+    p = Parser(l, dir_func)
+    c = Compiler(p)
+
     result = c.test("")
     expected = Crate([])
 
     assert result == expected
 
+    p.restart()
+
 def test_compiler_1():
+    l = Lexer()
+    dir_func = DirFunc()
+    p = Parser(l, dir_func)
+    c = Compiler(p)
+
     result = c.test("""
 static global_bool: bool;
 static global_i32: i32;
@@ -96,3 +103,5 @@ let local_f64_main_2: f64;
     ])
 
     assert result.to_string() == expected.to_string()
+
+    p.restart()
