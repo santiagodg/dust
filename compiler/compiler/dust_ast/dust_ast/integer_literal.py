@@ -1,6 +1,13 @@
+import copy
+from typing import Optional
+
+from .primitive_type import PrimitiveType
+from .dust_type import Type
+
 class IntegerLiteral:
     def __init__(self, integer: int):
         self.__integer: int = integer
+        self.__type: Type = Type(PrimitiveType('i32'))
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -12,6 +19,10 @@ class IntegerLiteral:
     
     def value(self) -> int:
         return self.__integer
+    
+    def type(self) -> Optional[Type]:
+        ":rtype: Optional[Type]"
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other):
         if not isinstance(other, IntegerLiteral):

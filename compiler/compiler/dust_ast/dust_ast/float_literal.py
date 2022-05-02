@@ -1,6 +1,12 @@
+import copy
+
+from .primitive_type import PrimitiveType
+from .dust_type import Type
+
 class FloatLiteral:
     def __init__(self, f: float):
         self.__float: float = f
+        self.__type: Type = Type(PrimitiveType('float'))
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -9,6 +15,9 @@ class FloatLiteral:
         result += f'FloatLiteral:\n'
         result += f"{space_padding}{space_indent}float: {self.__float}"
         return result
+    
+    def type(self) -> Type:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other):
         if not isinstance(other, FloatLiteral):

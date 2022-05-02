@@ -1,3 +1,6 @@
+import copy
+from typing import Optional
+
 from .plot_expression import PlotExpression
 from .scatter_expression import ScatterExpression
 from .histogram_expression import HistogramExpression
@@ -12,6 +15,7 @@ from .skewness_expression import SkewnessExpression
 from .kurtosis_expression import KurtosisExpression
 from .r_squared_expression import RSquaredExpression
 from .sum_expression import SumExpression
+from .dust_type import Type
 
 class StatisticExpression:
     def __init__(
@@ -32,6 +36,7 @@ class StatisticExpression:
             | SumExpression):
 
         self.__expression = expression
+        self.__type = self.__expression.type()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -41,6 +46,9 @@ class StatisticExpression:
         expression_str: str = self.__expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

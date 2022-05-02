@@ -5,7 +5,9 @@ from .identifier import Identifier
 
 class FunctionParameter:
     def __init__(self, identifier: Identifier, type: Type):
-        self.__identifier: Identifier = identifier
+        typed_identifier: Identifier = copy.deepcopy(identifier)
+        typed_identifier.set_type(type)
+        self.__identifier = typed_identifier
         self.__type: Type = type
     
     def identifier(self) -> Identifier:

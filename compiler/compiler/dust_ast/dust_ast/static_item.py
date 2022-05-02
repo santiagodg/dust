@@ -5,11 +5,16 @@ from .identifier import Identifier
 
 class StaticItem:
     def __init__(self, identifier: Identifier, type: Type):
-        self.__identifier: Identifier = identifier
+        typed_identifier: Identifier = copy.deepcopy(identifier)
+        typed_identifier.set_type(type)
+        self.__identifier = typed_identifier
         self.__type: Type = type
     
     def identifier(self) -> Identifier:
         return copy.deepcopy(self.__identifier)
+
+    def type(self) -> Type:
+        return copy.deepcopy(self.__type)
     
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

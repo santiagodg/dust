@@ -1,3 +1,5 @@
+import copy
+
 class PrimitiveType:
     def __init__(self, type: str):
         self.__type: str = type
@@ -9,6 +11,9 @@ class PrimitiveType:
         result += f'PrimitiveType:\n'
         result += f"{space_padding}{space_indent}type: '{self.__type}'"
         return result
+    
+    def canonical(self) -> str:
+        return copy.deepcopy(self.__type)
     
     def __eq__(self, other):
         if not isinstance(other, PrimitiveType):
@@ -28,3 +33,6 @@ class PrimitiveType:
         result += ','.join(attr_str)
         result += ')'
         return result
+    
+    def __hash__(self):
+        return hash(self.canonical())

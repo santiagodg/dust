@@ -1,6 +1,7 @@
 from typing import Optional
 
 from .block_expression import BlockExpression
+from .dust_type import Type
 
 class IfExpression:
     def __init__(self, expression, true_block: BlockExpression, false_block: BlockExpression):
@@ -31,6 +32,9 @@ class IfExpression:
             result += f'{space_padding}{space_indent}false_block: {false_block_str}'
 
         return result
+    
+    def type(self) -> Optional[Type]:
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

@@ -1,3 +1,7 @@
+from typing import Optional
+
+from .dust_type import Type
+
 class AssignmentExpression:
     def __init__(self, left_expression, right_expression):
         """
@@ -18,6 +22,9 @@ class AssignmentExpression:
         right_expression_str: str = self.__right_expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}right_expression: {right_expression_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

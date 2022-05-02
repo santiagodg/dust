@@ -1,3 +1,7 @@
+from typing import Optional
+
+from .dust_type import Type
+
 class ScatterExpression:
     def __init__(self, expression_0, expression_1):
         """
@@ -18,6 +22,9 @@ class ScatterExpression:
         expression_1_str: str = self.__expression_1.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression_1: {expression_1_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

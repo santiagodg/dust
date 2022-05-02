@@ -1,3 +1,7 @@
+from typing import Optional
+
+from .dust_type import Type
+
 class WriteExpression:
     def __init__(self, expression):
         "expression: Expression"
@@ -11,6 +15,9 @@ class WriteExpression:
         expression_str: str = self.__expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

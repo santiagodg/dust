@@ -1,6 +1,13 @@
+import copy
+from typing import Optional
+
+from .primitive_type import PrimitiveType
+from .dust_type import Type
+
 class BooleanLiteral:
     def __init__(self, boolean: bool):
         self.__boolean: boolean = boolean
+        self.__type: Type = Type(PrimitiveType('bool'))
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -9,6 +16,9 @@ class BooleanLiteral:
         result += f'BooleanLiteral:\n'
         result += f"{space_padding}{space_indent}boolean: {self.__boolean}"
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other):
         if not isinstance(other, BooleanLiteral):

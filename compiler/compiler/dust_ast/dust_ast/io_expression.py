@@ -1,5 +1,9 @@
+from typing import Optional
+import copy
+
 from .read_expression import ReadExpression
 from .write_expression import WriteExpression
+from .dust_type import Type
 
 class IoExpression:
     def __init__(
@@ -8,6 +12,7 @@ class IoExpression:
             | WriteExpression):
 
         self.__expression: ReadExpression | WriteExpression = expression
+        self.__type = self.__expression.type()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -17,6 +22,9 @@ class IoExpression:
         expression_str: str = self.__expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

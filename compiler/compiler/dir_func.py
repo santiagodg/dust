@@ -42,7 +42,7 @@ class FunctionEntry:
     def __init__(
             self,
             identifier: Identifier,
-            parameters: dict[str, list[FunctionParameter]] = {},
+            parameters: dict[str, FunctionParameter] = {},
             return_type: Optional[PrimitiveType] = None,
             let_statements: dict[str, LetStatement] = {}):
 
@@ -63,12 +63,24 @@ class FunctionEntry:
     def set_return_type(self, return_type: PrimitiveType):
         self.__return_type = return_type
     
-    def return_type(self) -> PrimitiveType:
+    def return_type(self) -> Optional[PrimitiveType]:
         return copy.deepcopy(self.__return_type)
     
     def identifier(self) -> Identifier:
         return copy.deepcopy(self.__identifier)
     
+    def parameter_type_list(self) -> list[Type]:
+        return copy.deepcopy(list(map(lambda parameter: parameter.type(), list(self.__parameters.values()))))
+    
+    def get_typed_local_identifier(self, identifier: Identifier) -> Optional[Identifier]:
+        if identifier.identifier() in self.__parameters:
+            return copy.deepcopy(self.__parameters[identifier.identifier()].identifier())
+        
+        if identifier.identifier() in self.__let_statements:
+            return copy.deepcopy(self.__let_statements[identifier.identifier()].identifier())
+        
+        return None
+
     def __repr__(self):
         return self.__str__()
 
@@ -100,7 +112,6 @@ class DirFunc:
         return None
     
     def add_function_identifier(self, identifier: Identifier):
-        # print(f"Called DirFunc.add_function_identifier with identifier {identifier}")
         self.__functions[identifier.identifier()] = FunctionEntry(identifier)
     
     def add_function_parameter(self, function_identifier: Identifier, function_parameter: FunctionParameter):
@@ -124,12 +135,45 @@ class DirFunc:
 
         return function_entry.exists_identifier(variable_identifier)
 
-    def search_static_item(self, identifier: Identifier) -> Optional[StaticItem]:
+    def exists(self, identifier: Identifier) -> bool:
+        return identifier.identifier() in (self.__functions.keys() ^ self.__static_items.keys())
+    
+    def exists_function(self, identifier: Identifier) -> bool:
+        return identifier.identifier() in self.__functions.keys()
+    
+    def get_typed_local_or_static_identifier(self, function_identifier: Identifier, identifier: Identifier) -> Optional[Type]:
+        """
+        Returns a typed local or static identifier.
+
+        :param function_identifier: The function identifier of the current scope.
+        :type function_identifier: Identifier
+        :param identifier: The identifier without type. The returned identifier will match this name if it is found.
+        :type identifier: Identifier
+        :return: A type local or static identifier if found. Returning a typed local identifier is preferred, otherwise a typed static identifier is returned.
+        :rtype: Optional[Type]
+        """
+
+        if identifier.identifier() in self.__static_items.keys():
+            return copy.deepcopy(self.__static_items[identifier.identifier()].identifier())
+        
+        if function_identifier.identifier() in self.__functions:
+            function_entry = self.__functions[function_identifier.identifier()]
+
+            if function_entry.exists_identifier(identifier):
+                return function_entry.get_typed_local_identifier(identifier)
+        
         return None
 
-    def exists(self, identifier: Identifier) -> bool:
-        # print(self.__functions.keys() ^ self.__static_items.keys())
-        return identifier.identifier() in (self.__functions.keys() ^ self.__static_items.keys())
+    
+    def function_parameters_match(self, function_identifier: Identifier, parameter_types: list[Type]) -> bool:
+        for p1, p2 in zip(parameter_types, self.__functions[function_identifier.identifier()].parameter_type_list()):
+            if p1 != p2:
+                return False
+        
+        return True
+    
+    def function_entry(self, function_identifier: Identifier) -> FunctionEntry:
+        return self.__functions[function_identifier.identifier()]
 
     def __repr__(self):
         return self.__str__()

@@ -61,8 +61,8 @@ class Lexer:
 
     def t_CHAR_LITERAL(self, t):
         r"'[^'\\\n\t\r]'"
-        print(f'Found char literal: {t}')
         t.value = CharLiteral(t.value)
+        return t
 
     def t_FLOAT_LITERAL(self, t):
         r'[0-9][0-9]*\.[0-9][0-9]*'

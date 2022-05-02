@@ -1,11 +1,17 @@
 import copy
 
+from .dust_type import Type
+
 class Identifier:
     def __init__(self, identifier: str):
         self.__identifier: str = identifier
+        self.__type = None
 
     def identifier(self) -> str:
         return copy.deepcopy(self.__identifier)
+    
+    def set_type(self, type: Type):
+        self.__type = type
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -14,6 +20,9 @@ class Identifier:
         result += f'Identifier:\n'
         result += f"{space_padding}{space_indent}identifier: '{self.__identifier}'"
         return result
+    
+    def type(self) -> Type:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other):
         if not isinstance(other, Identifier):

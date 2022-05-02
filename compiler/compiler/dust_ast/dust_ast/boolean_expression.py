@@ -1,5 +1,10 @@
+import copy
+from typing import Optional
+
+from .dust_type import Type
+
 class BooleanExpression:
-    def __init__(self, left_expression, operator: str, right_expression):
+    def __init__(self, left_expression, operator: str, right_expression, semantic_cube):
         """
         left_expression: Expression
         operator: str
@@ -9,6 +14,11 @@ class BooleanExpression:
         self.__left_expression = left_expression
         self.__operator = operator
         self.__right_expression = right_expression
+        
+        self.__type: Optional[Type] = None
+        return_type = semantic_cube.search_binary_operation(self.__left_expression.type().type(), self.__operator, self.__right_expression.type().type())
+        if return_type != None:
+            self.__type = Type(return_type)
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -21,6 +31,9 @@ class BooleanExpression:
         right_expression_str: str = self.__right_expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}right_expression: {right_expression_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

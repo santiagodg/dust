@@ -1,5 +1,8 @@
+from typing import Optional
+
 from .infinite_loop_expression import InfiniteLoopExpression
 from .predicate_loop_expression import PredicateLoopExpression
+from .dust_type import Type
 
 class LoopExpression:
     def __init__(self, expression: InfiniteLoopExpression | PredicateLoopExpression):
@@ -13,6 +16,9 @@ class LoopExpression:
         expression_str: str = self.__expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

@@ -1,9 +1,13 @@
+import copy
+from typing import Optional
+
 from .negation_expression import NegationExpression
 from .arithmetic_expression import ArithmeticExpression
 from .comparison_expression import ComparisonExpression
 from .boolean_expression import BooleanExpression
 from .type_cast_expression import TypeCastExpression
 from .assignment_expression import AssignmentExpression
+from .dust_type import Type
 
 class OperatorExpression:
     def __init__(
@@ -16,6 +20,7 @@ class OperatorExpression:
             | AssignmentExpression):
 
         self.__expression = expression
+        self.__type = self.__expression.type()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -25,6 +30,9 @@ class OperatorExpression:
         expression_str: str = self.__expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

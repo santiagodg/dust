@@ -1,4 +1,7 @@
+from typing import Optional
+
 from .block_expression import BlockExpression
+from .dust_type import Type
 
 class InfiniteLoopExpression:
     def __init__(self, block: BlockExpression):
@@ -12,6 +15,9 @@ class InfiniteLoopExpression:
         block_str: str = self.__block.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}block: {block_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

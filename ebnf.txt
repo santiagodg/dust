@@ -86,7 +86,7 @@ ArrayExpression ::= '[' ArrayElements? ']'
 ArrayElements ::= Expression (',' Expression)* ','?
                | Expression ';' INTEGER_LITERAL
 
-IndexExpression ::= Expression '[' Expression ']'
+IndexExpression ::= Expression '[' INTEGER_LITERAL ']'
 
 CallExpression ::= IDENTIFIER '(' CallParams? ')'
 

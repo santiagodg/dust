@@ -1,7 +1,14 @@
+import copy
+from typing import Optional
+
+from .primitive_type import PrimitiveType
+from .dust_type import Type
+
 class MinExpression:
     def __init__(self, expression):
         "expression: Expression"
         self.__expression = expression
+        self.__type = Type(PrimitiveType('f64'))
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -11,8 +18,11 @@ class MinExpression:
         expression_str: str = self.__expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
-    def __eq__(self, other) : 
+    def __eq__(self, other):
         return self.__dict__ == other.__dict__
     
     def __repr__(self):

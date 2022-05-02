@@ -1,7 +1,13 @@
+import copy
+from typing import Optional
+
+from .dust_type import Type
+
 class ArrayExpression:
     def __init__(self, array_elements):
         "array_elements: list[Expression]"
         self.__array_elements = array_elements
+        self.__type = self.__array_elements[0].type()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -21,6 +27,9 @@ class ArrayExpression:
             result += f'{space_padding}{space_indent}]'
         
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

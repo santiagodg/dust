@@ -1,3 +1,6 @@
+import copy
+from typing import Optional
+
 from .literal_expression import LiteralExpression
 from .operator_expression import OperatorExpression
 from .grouped_expression import GroupedExpression
@@ -9,6 +12,7 @@ from .break_expression import BreakExpression
 from .return_expression import ReturnExpression
 from .special_function_expression import SpecialFunctionExpression
 from .identifier import Identifier
+from .dust_type import Type
 
 class ExpressionWithoutBlock:
     def __init__(
@@ -27,6 +31,7 @@ class ExpressionWithoutBlock:
             ):
 
         self.__expression = expression
+        self.__type = self.__expression.type()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -38,6 +43,9 @@ class ExpressionWithoutBlock:
         result += f'{space_padding}{space_indent}expression: {expression_str}'
 
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

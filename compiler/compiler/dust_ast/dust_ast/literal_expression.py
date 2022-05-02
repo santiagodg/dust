@@ -1,11 +1,16 @@
+import copy
+from typing import Optional
+
 from .char_literal import CharLiteral
 from .integer_literal import IntegerLiteral
 from .float_literal import FloatLiteral
 from .boolean_literal import BooleanLiteral
+from .dust_type import Type
 
 class LiteralExpression:
     def __init__(self, literal: CharLiteral | IntegerLiteral | FloatLiteral | BooleanLiteral):
         self.__literal = literal
+        self.__type = self.__literal.type()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -15,6 +20,9 @@ class LiteralExpression:
         literal_str = self.__literal.to_string(indent, padding + indent)
         result += f"{space_padding}{space_indent}literal: {literal_str}"
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

@@ -1,5 +1,9 @@
+import copy
+from typing import Optional
+
 from .io_expression import IoExpression
 from .statistic_expression import StatisticExpression
+from .dust_type import Type
 
 class SpecialFunctionExpression:
     def __init__(
@@ -8,6 +12,7 @@ class SpecialFunctionExpression:
             | StatisticExpression):
 
         self.__expression: IoExpression | StatisticExpression = expression
+        self.__type = self.__expression.type()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -17,6 +22,9 @@ class SpecialFunctionExpression:
         expression_str: str = self.__expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

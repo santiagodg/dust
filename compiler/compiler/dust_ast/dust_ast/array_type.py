@@ -1,14 +1,14 @@
-from .integer_literal import IntegerLiteral
-
 class ArrayType:
-    def __init__(self, type, length: IntegerLiteral):
+    def __init__(self, type, length):
         """
-        type: Type
-        length: IntegerLiteral
+        :param type: Type of the elements of the array
+        :type type: Type
+        :param length: Length of the array
+        :type length: IntegerLiteral
         """
         
         self.__type = type
-        self.__length: IntegerLiteral = length
+        self.__length = length
     
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -20,6 +20,9 @@ class ArrayType:
         length_str: str = self.__length.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}length: {length_str}'
         return result
+    
+    def canonical(self) -> str:
+        return f'[{self.__type.canonical()}]'
     
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

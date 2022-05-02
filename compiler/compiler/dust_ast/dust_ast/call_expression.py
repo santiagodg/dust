@@ -1,7 +1,11 @@
+from typing import Optional
+import copy
+
 from .identifier import Identifier
+from .dust_type import Type
 
 class CallExpression:
-    def __init__(self, identifier: Identifier, call_params):
+    def __init__(self, identifier: Identifier, call_params, dir_func):
         """
         identifier: Identifier
         call_params: list[Expression]
@@ -9,6 +13,11 @@ class CallExpression:
 
         self.__identifier = identifier
         self.__call_params = call_params
+        self.__type: Optional[Type] = None
+
+        return_type = dir_func.function_entry(self.__identifier).return_type()
+        if return_type != None:
+            self.__type = Type(return_type)
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -30,6 +39,9 @@ class CallExpression:
             result += f'{space_padding}{space_indent}]'
 
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

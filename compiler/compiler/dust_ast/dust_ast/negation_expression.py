@@ -1,5 +1,10 @@
+from typing import Optional
+import copy
+
+from .dust_type import Type
+
 class NegationExpression:
-    def __init__(self, operator: str, expression):
+    def __init__(self, operator: str, expression, semantic_cube):
         """
         operator: str
         expression: Expression
@@ -7,6 +12,12 @@ class NegationExpression:
         
         self.__operator = operator
         self.__expression = expression
+        self.__semantic_cube = semantic_cube
+
+        self.__type: Optional[Type] = None
+        return_type = self.__semantic_cube.search_unary_operation(self.__operator, self.__expression.type().type())
+        if return_type != None:
+            self.__type = Type(return_type)
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -17,6 +28,9 @@ class NegationExpression:
         expression_str: str = self.__expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

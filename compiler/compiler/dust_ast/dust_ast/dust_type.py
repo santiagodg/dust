@@ -1,9 +1,23 @@
+import copy
+
 from .primitive_type import PrimitiveType
 from .array_type import ArrayType
 
 class Type:
     def __init__(self, type: PrimitiveType | ArrayType):
         self.__type: PrimitiveType | ArrayType = type
+
+    def canonical(self) -> str:
+        return self.__type.canonical()
+    
+    def is_primitive(self) -> bool:
+        return isinstance(self.__type, PrimitiveType)
+    
+    def is_array(self) -> bool:
+        return isinstance(self.__type, ArrayType)
+    
+    def type(self) -> PrimitiveType | ArrayType:
+        return copy.deepcopy(self.__type)
     
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

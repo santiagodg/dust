@@ -20,6 +20,9 @@ class PredicateLoopExpression:
         block_str: str = self.__block.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}block: {block_str}'
         return result
+    
+    def type(self):
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

@@ -1,3 +1,6 @@
+from typing import Optional
+
+from .dust_type import Type
 from .index_expression import IndexExpression
 from .identifier import Identifier
 
@@ -15,6 +18,9 @@ class ReadExpression:
         result += f'{space_padding}{space_indent}variable: {variable_str}'
 
         return result
+    
+    def type(self) -> Optional[Type]:
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

@@ -1,3 +1,6 @@
+from typing import Optional
+import copy
+
 from .dust_type import Type
 
 class TypeCastExpression:
@@ -20,6 +23,9 @@ class TypeCastExpression:
         type_str: str = self.__type.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}type: {type_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

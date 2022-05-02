@@ -1,5 +1,7 @@
 import copy
 import sys
+from .dir_func import DirFunc
+from .semantic_cube import SemanticCube
 
 from .ply import yacc
 
@@ -60,7 +62,6 @@ class Parser():
     
     def p_function_check_id(self, p):
         "function_check_id : "
-        # print(f"Calling DirFunc.exists for identifier {p[-1]}")
 
         if self.__dir_func.exists(p[-1]):
             print(f"Multiple declaration: function '{p[-1].identifier()}' in line {self.lexer.lexer.lineno}")
@@ -152,9 +153,8 @@ class Parser():
         """expression : error"""
         print(f"Syntax error in expression. Bad subexpression on lines {p.linespan(1)[0]}-{p.linespan(1)[1]}")
     
-    def p_expression_without_block(self, p):
+    def p_expression_without_block_not_identifier(self, p):
         """expression_without_block : literal_expression
-                                    | IDENTIFIER
                                     | operator_expression
                                     | grouped_expression
                                     | array_expression
@@ -166,6 +166,16 @@ class Parser():
                                     | special_function_expression"""
         
         p[0] = ExpressionWithoutBlock(p[1])
+    
+    def p_expression_without_block_identifier(self, p):
+        """expression_without_block : IDENTIFIER"""
+        typed_identifier = self.__dir_func.get_typed_local_or_static_identifier(self.__temp_function_identifier, p[1])
+        
+        if typed_identifier == None:
+            print(f"Use of undeclared identifier '{p[1].identifier()}' in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        p[0] = ExpressionWithoutBlock(typed_identifier)
     
     def p_expression_with_block(self, p):
         """expression_with_block : loop_expression
@@ -203,7 +213,15 @@ class Parser():
         """negation_expression : '-' expression %prec UMINUS
                                | '!' expression"""
         
-        p[0] = NegationExpression(p[1], p[2])
+        if not p[2].type().is_primitive():
+            print(f"Cannot apply unary '{p[1]}' operator non-primitive type {p[2].type()} expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if self.__semantic_cube.search_unary_operation(p[1], p[2].type().type()) == None: 
+            print(f"Cannot apply unary '{p[1]}' operator to type {p[2].type()} expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        p[0] = NegationExpression(p[1], p[2], self.__semantic_cube)
     
     def p_arithmetic_expression(self, p):
         """arithmetic_expression : expression '+' expression
@@ -211,8 +229,20 @@ class Parser():
                                  | expression '*' expression
                                  | expression '/' expression
                                  | expression '%' expression"""
+
+        if not p[1].type().is_primitive():
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type()} left expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
         
-        p[0] = ArithmeticExpression(p[1], p[2], p[3])
+        if not p[3].type().is_primitive():
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type()} rigth expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if self.__semantic_cube.search_binary_operation(p[1].type().type(), p[2], p[3].type().type()) == None:
+            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        p[0] = ArithmeticExpression(p[1], p[2], p[3], self.__semantic_cube)
     
     def p_comparison_expression(self, p):
         """comparison_expression : expression EQ expression
@@ -221,21 +251,63 @@ class Parser():
                                  | expression '<' expression
                                  | expression GE expression
                                  | expression LE expression"""
+                                
+        if not p[1].type().is_primitive():
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type()} left expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
         
-        p[0] = ComparisonExpression(p[1], p[2], p[3])
+        if not p[3].type().is_primitive():
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type()} rigth expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if self.__semantic_cube.search_binary_operation(p[1].type().type(), p[2], p[3].type().type()) == None:
+            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        p[0] = ComparisonExpression(p[1], p[2], p[3], self.__semantic_cube)
     
     def p_boolean_expression(self, p):
         """boolean_expression : expression OR expression
                               | expression AND expression"""
         
-        p[0] = BooleanExpression(p[1], p[2], p[3])
+        if not p[1].type().is_primitive():
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type()} left expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        if not p[3].type().is_primitive():
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type()} rigth expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if self.__semantic_cube.search_binary_operation(p[1].type().type(), p[2], p[3].type().type()) == None:
+            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        p[0] = BooleanExpression(p[1], p[2], p[3], self.__semantic_cube)
     
     def p_type_cast_expression(self, p):
         "type_cast_expression : expression AS type"
+
+        if not p[1].type().is_primitive():
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type()} left expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        if not p[3].type().is_primitive():
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type()} rigth expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if self.__semantic_cube.search_binary_operation(p[1].type().type(), p[2], p[3].type().type()) == None:
+            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = TypeCastExpression(p[1], p[3])
     
     def p_assignment_expression(self, p):
         "assignment_expression : expression '=' expression"
+
+        if p[1].type() != p[3].type():
+            print(f"Cannot assign left expression of type {p[1].type()} to right expression of type {p[3].type()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
         p[0] = AssignmentExpression(p[1], p[3])
     
     def p_grouped_expression(self, p):
@@ -254,10 +326,15 @@ class Parser():
     def p_array_elements_literal(self, p):
         """array_elements_literal : array_elements_literal ',' expression
                                   | expression"""
-        
+
         if len(p) == 2:
+            self.__temp_array_elements_literal_type =  p[1].type()
             p[0] = [p[1]]
         else:
+            if p[3].type() != self.__temp_array_elements_literal_type:
+                print(f"Cannot add expression of type {p[3].type()} to literal array expression of type {self.__temp_array_elements_literal_type} in line {self.lexer.lexer.lineno}")
+                sys.exit(1)
+            
             p[0] = p[1] + [p[3]]
     
     def p_array_elements_repeat(self, p):
@@ -271,18 +348,38 @@ class Parser():
         p[0] = result
     
     def p_index_expression(self, p):
-        "index_expression : expression '[' expression ']'"
+        "index_expression : expression '[' INTEGER_LITERAL ']'"
+
+        if not p[1].type().is_array():
+            print(f"Cannot perform indexing for expression of type {p[1].type()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        if p[3].value() < 0 or p[1].type().type().length() >= p[3].value():
+            print(f"Index '{p[3].value()}' out of range for array of length {p[1].type().type().length()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = IndexExpression(p[1], p[3])
     
     def p_call_expression(self, p):
         """call_expression : IDENTIFIER '(' call_params ',' ')'
                            | IDENTIFIER '(' call_params empty ')'"""
         
-        p[0] = CallExpression(p[1], p[3])
+        call_params_types: list[Type] = list(map(lambda param: param.type(), p[3]))
+        if not self.__dir_func.function_parameters_match(p[1], call_params_types):
+            print(f"Call parameter types do not match function parameter types in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        p[0] = CallExpression(p[1], p[3], self.__dir_func)
     
     def p_call_expression_empty(self, p):
         "call_expression : IDENTIFIER '(' empty ')'"
-        p[0] = CallExpression(p[1], [])
+
+        call_params_types: list[Type] = list(map(lambda param: param.type(), p[3]))
+        if not self.__dir_func.function_parameters_match(p[1], call_params_types):
+            print(f"Call parameter types do not match function parameter types in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        p[0] = CallExpression(p[1], [], self.__dir_func)
     
     def p_call_params(self, p):
         """call_params : call_params ',' expression
@@ -303,10 +400,20 @@ class Parser():
 
     def p_return_expression(self, p):
         "return_expression : RETURN expression"
+
+        if self.__dir_func.function_entry(self.__temp_function_identifier).return_type() != p[2].type():
+            print(f"Return expression of type {p[2].type()} does not match function declaration return type {self.__dir_func.function_entry(self.__temp_function_identifier).return_type()}")
+            sys.exit(1)
+        
         p[0] = ReturnExpression(p[2])
 
     def p_return_expression_empty(self, p):
         "return_expression : RETURN empty"
+
+        if self.__dir_func.function_entry(self.__temp_function_identifier).return_type() != None:
+            print(f"Return expression of type {p[2].type()} does not match function declaration return type {self.__dir_func.function_entry(self.__temp_function_identifier).return_type()}")
+            sys.exit(1)
+
         p[0] = ReturnExpression(None)
     
     def p_special_function_expression(self, p):
@@ -325,10 +432,19 @@ class Parser():
         """read_expression : READ '(' IDENTIFIER ')'
                            | READ '(' index_expression ')'"""
         
+        if p[3].type() != Type(PrimitiveType('char')):
+            print(f"Parameter must be of type char in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = ReadExpression(p[3])
 
     def p_write_expression(self, p):
         "write_expression : WRITE '(' expression ')'"
+
+        if p[3].type() != Type(PrimitiveType('char')):
+            print(f"Parameter must be of type char in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = WriteExpression(p[3])
     
     def p_write_expression_error(self, p):
@@ -355,58 +471,144 @@ class Parser():
     
     def p_plot_expression(self, p):
         "plot_expression : PLOT '(' expression ',' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        if p[5].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"Second parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = PlotExpression(p[3], p[5])
     
     def p_scatter_expression(self, p):
         "scatter_expression : SCATTER '(' expression ',' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        if p[5].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"Second parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = ScatterExpression(p[3], p[5])
     
     def p_histogram_expression(self, p):
         "histogram_expression : HISTOGRAM '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = HistogramExpression(p[3])
     
     def p_mean_expression(self, p):
         "mean_expression : MEAN '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        if p[5].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"Second parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = MeanExpression(p[3])
     
     def p_median_expression(self, p):
         "median_expression : MEDIAN '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = MedianExpression(p[3])
     
     def p_mean_square_expression(self, p):
         "mean_square_error_expression : MEAN_SQUARE_ERROR '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = MeanSquareErrorExpression(p[3])
     
     def p_min_expression(self, p):
         "min_expression : MIN '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = MinExpression(p[3])
     
     def p_max_expression(self, p):
         "max_expression : MAX '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = MaxExpression(p[3])
     
     def p_standard_deviation_expression(self, p):
         "standard_deviation_expression : STANDARD_DEVIATION '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = StandardDeviationExpression(p[3])
     
     def p_variance_expression(self, p):
         "variance_expression : VARIANCE '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = VarianceExpression(p[3])
     
     def p_skewness_expression(self, p):
         "skewness_expression : SKEWNESS '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = SkewnessExpression(p[3])
     
     def p_kurtosis_expression(self, p):
         "kurtosis_expression : KURTOSIS '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = KurtosisExpression(p[3])
     
     def p_r_squared_expression(self, p):
         "r_squared_expression : R_SQUARED '(' expression ',' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
+        if p[5].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"Second parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = RSquaredExpression(p[3], p[5])
     
     def p_sum_expression(self, p):
         "sum_expression : SUM '(' expression ')'"
+
+        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+            print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+        
         p[0] = SumExpression(p[3])
     
     def p_loop_expression(self, p):
@@ -421,14 +623,29 @@ class Parser():
     
     def p_predicate_loop_expression(self, p):
         "predicate_loop_expression : WHILE expression block_expression"
+
+        if p[2].type() != Type(PrimitiveType('bool')):
+            print(f"While condition must evaluate to a boolean value")
+            sys.exit(1)
+        
         p[0] = PredicateLoopExpression(p[2], p[3])
     
     def p_if_expression(self, p):
         """if_expression : IF expression block_expression ELSE block_expression"""
+
+        if p[2].type() != Type(PrimitiveType('bool')):
+            print(f"If condition must evaluate to a boolean value")
+            sys.exit(1)
+        
         p[0] = IfExpression(p[2], p[3], p[5])
     
     def p_if_expression_without_else(self, p):
         """if_expression : IF expression block_expression"""
+
+        if p[2].type() != Type(PrimitiveType('bool')):
+            print(f"If condition must evaluate to a boolean value")
+            sys.exit(1)
+        
         p[0] = IfExpression(p[2], p[3], None)
 
     def p_type(self, p):
@@ -462,9 +679,10 @@ class Parser():
         print("Syntax error in input!")
         print(f"Illegal token {p} at line {self.lexer.lexer.lineno}")
     
-    def __init__(self, lexer, dir_func, **kwargs):
+    def __init__(self, lexer, dir_func: DirFunc, semantic_cube: SemanticCube, **kwargs):
         self.lexer = lexer
         self.__dir_func = dir_func
+        self.__semantic_cube = semantic_cube
         self.__temp_function_identifier = None
         self.parser = yacc.yacc(module=self, **kwargs)
     

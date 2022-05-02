@@ -1,9 +1,14 @@
+import copy
+from typing import Optional
+
 from .loop_expression import LoopExpression
 from .if_expression import IfExpression
+from .dust_type import Type
 
 class ExpressionWithBlock:
     def __init__(self, expression: LoopExpression | IfExpression):
         self.__expression: LoopExpression | IfExpression = expression
+        self.__type = self.__expression.type()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -13,6 +18,9 @@ class ExpressionWithBlock:
         expression_str: str = self.__expression.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
+
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__
