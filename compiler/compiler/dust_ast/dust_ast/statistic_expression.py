@@ -49,6 +49,14 @@ class StatisticExpression:
     
     def type(self) -> Optional[Type]:
         return copy.deepcopy(self.__type)
+    
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+        
+        print(f"{self.__class__.__name__}.operand: Not yet implemented")
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

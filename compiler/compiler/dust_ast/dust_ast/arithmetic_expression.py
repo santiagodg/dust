@@ -4,16 +4,18 @@ from typing import Optional
 from .dust_type import Type
 
 class ArithmeticExpression:
-    def __init__(self, left_expression, operator: str, right_expression, semantic_cube):
+    def __init__(self, left_expression, operator: str, right_expression, semantic_cube, temp_var_generator):
         """
         left_expression: Expression
         operator: str
         right_expression: Expression
+        temp_var_generator: TemporaryVariableGenerator
         """
         
         self.__left_expression = left_expression
         self.__operator = operator
         self.__right_expression = right_expression
+        self.__temporary_variable = temp_var_generator.next()
 
         self.__type: Optional[Type] = None
         return_type = semantic_cube.search_binary_operation(self.__left_expression.type().type(), self.__operator, self.__right_expression.type().type())
@@ -34,6 +36,28 @@ class ArithmeticExpression:
 
     def type(self) -> Optional[Type]:
         return copy.deepcopy(self.__type)
+    
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+
+        return self.__temporary_variable
+
+    def quadruples(self):
+        """
+        :rtype: List[Tuple[str, str, str, str]]
+        """
+
+        left_expression_temporary_variable = self.__left_expression.operand()
+        right_expression_temporary_variable = self.__right_expression.operand()
+
+        return [(
+            self.__operator, 
+            left_expression_temporary_variable, 
+            right_expression_temporary_variable,
+            self.__temporary_variable
+        )]
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

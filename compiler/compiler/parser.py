@@ -8,6 +8,35 @@ from .ply import yacc
 from .lexer import Lexer
 from .dust_ast import *
 
+class TemporaryVariable:
+    def __init__(self, number: int):
+        self.__number = number
+    
+    def number(self) -> int:
+        return self.__number
+    
+    def __repr__(self):
+        return self.__str__()
+    
+    def __str__(self):
+        result = f'{type(self).__name__}('
+        attr_str = []
+        for key, value in vars(self).items():
+            prefix = key.replace(f"_{type(self).__name__}", '')
+            attr_str += [f'{prefix}={str(value)}']
+        result += ','.join(attr_str)
+        result += ')'
+        return result
+
+class TemporaryVariableGenerator:
+    def __init__(self):
+        self.__counter = 1
+    
+    def next(self) -> TemporaryVariable:
+        new_temporary_variable = TemporaryVariable(self.__counter)
+        self.__counter += 1
+        return new_temporary_variable
+
 class Parser():
     tokens = Lexer().tokens
 
@@ -220,8 +249,9 @@ class Parser():
         if self.__semantic_cube.search_unary_operation(p[1], p[2].type().type()) == None: 
             print(f"Cannot apply unary '{p[1]}' operator to type {p[2].type()} expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
-        
-        p[0] = NegationExpression(p[1], p[2], self.__semantic_cube)
+
+        p[0] = NegationExpression(p[1], p[2], self.__semantic_cube, self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_arithmetic_expression(self, p):
         """arithmetic_expression : expression '+' expression
@@ -242,7 +272,8 @@ class Parser():
             print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = ArithmeticExpression(p[1], p[2], p[3], self.__semantic_cube)
+        p[0] = ArithmeticExpression(p[1], p[2], p[3], self.__semantic_cube, self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_comparison_expression(self, p):
         """comparison_expression : expression EQ expression
@@ -264,7 +295,8 @@ class Parser():
             print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = ComparisonExpression(p[1], p[2], p[3], self.__semantic_cube)
+        p[0] = ComparisonExpression(p[1], p[2], p[3], self.__semantic_cube, self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_boolean_expression(self, p):
         """boolean_expression : expression OR expression
@@ -282,7 +314,8 @@ class Parser():
             print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = BooleanExpression(p[1], p[2], p[3], self.__semantic_cube)
+        p[0] = BooleanExpression(p[1], p[2], p[3], self.__semantic_cube, self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_type_cast_expression(self, p):
         "type_cast_expression : expression AS type"
@@ -305,10 +338,11 @@ class Parser():
         "assignment_expression : expression '=' expression"
 
         if p[1].type() != p[3].type():
-            print(f"Cannot assign left expression of type {p[1].type()} to right expression of type {p[3].type()} in line {self.lexer.lexer.lineno}")
+            print(f"Cannot assign right expression of type {p[3].type()} to left expression of type {p[1].type()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = AssignmentExpression(p[1], p[3])
+        self.__quadruples += p[0].quadruples()
     
     def p_grouped_expression(self, p):
         "grouped_expression : '(' expression ')'"
@@ -679,11 +713,13 @@ class Parser():
         print("Syntax error in input!")
         print(f"Illegal token {p} at line {self.lexer.lexer.lineno}")
     
-    def __init__(self, lexer, dir_func: DirFunc, semantic_cube: SemanticCube, **kwargs):
+    def __init__(self, lexer, dir_func: DirFunc, semantic_cube: SemanticCube, quadruples, **kwargs):
         self.lexer = lexer
         self.__dir_func = dir_func
         self.__semantic_cube = semantic_cube
         self.__temp_function_identifier = None
+        self.__quadruples = quadruples
+        self.__temp_var_generator = TemporaryVariableGenerator()
         self.parser = yacc.yacc(module=self, **kwargs)
     
     def restart(self):

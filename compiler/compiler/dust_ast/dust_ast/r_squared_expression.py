@@ -1,3 +1,9 @@
+import copy
+from typing import Optional
+
+from .primitive_type import PrimitiveType
+from .dust_type import Type
+
 class RSquaredExpression:
     def __init__(self, expression_0, expression_1):
         """
@@ -7,6 +13,7 @@ class RSquaredExpression:
 
         self.__expression_0 = expression_0
         self.__expression_1 = expression_1
+        self.__type = Type(PrimitiveType('f64'))
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -18,6 +25,17 @@ class RSquaredExpression:
         expression_1_str: str = self.__expression_1.to_string(indent, padding + indent)
         result += f'{space_padding}{space_indent}expression_1: {expression_1_str}'
         return result
+    
+    def type(self) -> Optional[Type]:
+        return copy.deepcopy(self.__type)
+    
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+        
+        print(f"{self.__class__.__name__}.operand: Not yet implemented")
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

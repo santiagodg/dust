@@ -4,7 +4,7 @@ import copy
 from .dust_type import Type
 
 class NegationExpression:
-    def __init__(self, operator: str, expression, semantic_cube):
+    def __init__(self, operator: str, expression, semantic_cube, temp_var_generator):
         """
         operator: str
         expression: Expression
@@ -18,6 +18,8 @@ class NegationExpression:
         return_type = self.__semantic_cube.search_unary_operation(self.__operator, self.__expression.type().type())
         if return_type != None:
             self.__type = Type(return_type)
+        
+        self.__temporary_variable = temp_var_generator.next()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -31,6 +33,27 @@ class NegationExpression:
     
     def type(self) -> Optional[Type]:
         return copy.deepcopy(self.__type)
+    
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+
+        return self.__temporary_variable
+    
+    def quadruples(self):
+        """
+        :rtype: List[Tuple[str, str, str, str]]
+        """
+
+        expression_operand = self.__expression.operand()
+
+        return [(
+            self.__operator, 
+            expression_operand, 
+            '',
+            self.__temporary_variable
+        )]
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

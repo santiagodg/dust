@@ -6,7 +6,7 @@ from .dust_type import Type
 class FloatLiteral:
     def __init__(self, f: float):
         self.__float: float = f
-        self.__type: Type = Type(PrimitiveType('float'))
+        self.__type: Type = Type(PrimitiveType('f64'))
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -18,6 +18,16 @@ class FloatLiteral:
     
     def type(self) -> Type:
         return copy.deepcopy(self.__type)
+    
+    def value(self) -> float:
+        return self.__float
+    
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+        
+        return self
 
     def __eq__(self, other):
         if not isinstance(other, FloatLiteral):

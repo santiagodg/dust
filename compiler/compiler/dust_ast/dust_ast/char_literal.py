@@ -17,8 +17,18 @@ class CharLiteral:
         result += f"{space_padding}{space_indent}char: '{self.__char}'"
         return result
     
+    def value(self) -> str:
+        return self.__char
+    
     def type(self) -> Optional[Type]:
         return copy.deepcopy(self.__type)
+    
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+        
+        return self
 
     def __eq__(self, other):
         if not isinstance(other, CharLiteral):

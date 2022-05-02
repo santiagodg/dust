@@ -4,7 +4,7 @@ from typing import Optional
 from .dust_type import Type
 
 class BooleanExpression:
-    def __init__(self, left_expression, operator: str, right_expression, semantic_cube):
+    def __init__(self, left_expression, operator: str, right_expression, semantic_cube, temp_var_generator):
         """
         left_expression: Expression
         operator: str
@@ -19,6 +19,8 @@ class BooleanExpression:
         return_type = semantic_cube.search_binary_operation(self.__left_expression.type().type(), self.__operator, self.__right_expression.type().type())
         if return_type != None:
             self.__type = Type(return_type)
+        
+        self.__temporary_variable = temp_var_generator.next()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -34,6 +36,28 @@ class BooleanExpression:
     
     def type(self) -> Optional[Type]:
         return copy.deepcopy(self.__type)
+    
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+
+        return self.__temporary_variable
+
+    def quadruples(self):
+        """
+        :rtype: List[Tuple[str, str, str, str]]
+        """
+        
+        left_expression_temporary_variable = self.__left_expression.temp()
+        right_expression_temporary_variable = self.__right_expression.temp()
+
+        return [(
+            self.__operator, 
+            left_expression_temporary_variable, 
+            right_expression_temporary_variable,
+            self.__temporary_variable
+        )]
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

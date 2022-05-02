@@ -20,6 +20,13 @@ class GroupedExpression:
     
     def type(self) -> Optional[Type]:
         return copy.deepcopy(self.__type)
+    
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+        
+        return self.__expression.operand()
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

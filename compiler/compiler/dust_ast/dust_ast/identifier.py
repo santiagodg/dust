@@ -23,6 +23,13 @@ class Identifier:
     
     def type(self) -> Type:
         return copy.deepcopy(self.__type)
+    
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+        
+        return self
 
     def __eq__(self, other):
         if not isinstance(other, Identifier):

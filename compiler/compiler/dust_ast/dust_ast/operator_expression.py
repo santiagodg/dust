@@ -31,6 +31,13 @@ class OperatorExpression:
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
     
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+
+        return self.__expression.operand()
+    
     def type(self) -> Optional[Type]:
         return copy.deepcopy(self.__type)
 

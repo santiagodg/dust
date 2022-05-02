@@ -2,12 +2,15 @@ import copy
 from typing import Optional
 
 from .dust_type import Type
+from .array_type import ArrayType
+from .integer_literal import IntegerLiteral
 
 class ArrayExpression:
     def __init__(self, array_elements):
         "array_elements: list[Expression]"
         self.__array_elements = array_elements
-        self.__type = self.__array_elements[0].type()
+        self.__elements_type = self.__array_elements[0].type()
+        self.__type = Type(ArrayType(self.__elements_type, IntegerLiteral(len(self.__array_elements))))
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -30,6 +33,14 @@ class ArrayExpression:
     
     def type(self) -> Optional[Type]:
         return copy.deepcopy(self.__type)
+    
+    def operand(self):
+        """
+        :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
+        """
+
+        print(f"{self.__class__.__name__}.operand: Not yet implemented")
+        return None
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__
