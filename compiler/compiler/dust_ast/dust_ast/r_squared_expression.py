@@ -5,7 +5,7 @@ from .primitive_type import PrimitiveType
 from .dust_type import Type
 
 class RSquaredExpression:
-    def __init__(self, expression_0, expression_1):
+    def __init__(self, expression_0, expression_1, temp_var_generator):
         """
         expression_0: Expression
         expression_1: Expression
@@ -14,6 +14,7 @@ class RSquaredExpression:
         self.__expression_0 = expression_0
         self.__expression_1 = expression_1
         self.__type = Type(PrimitiveType('f64'))
+        self.__temporary_variable = temp_var_generator.next()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -33,9 +34,20 @@ class RSquaredExpression:
         """
         :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
         """
-        
-        print(f"{self.__class__.__name__}.operand: Not yet implemented")
-        return None
+
+        return self.__temporary_variable
+    
+    def quadruples(self):
+        """
+        :rtype: List[Tuple[str, str, str, str]]
+        """
+
+        return [(
+            f'{type(self).__name__} unimplemented', 
+            '', 
+            '',
+            self.__temporary_variable
+        )]
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

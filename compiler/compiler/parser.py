@@ -333,6 +333,7 @@ class Parser():
             sys.exit(1)
         
         p[0] = TypeCastExpression(p[1], p[3])
+        self.__quadruples += p[0].quadruples()
     
     def p_assignment_expression(self, p):
         "assignment_expression : expression '=' expression"
@@ -351,11 +352,13 @@ class Parser():
     def p_array_expression_not_empty(self, p):
         """array_expression : '[' array_elements_literal ']'
                             | '[' array_elements_repeat ']'"""
-        p[0] = ArrayExpression(p[2])
+        p[0] = ArrayExpression(p[2], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_array_expression_empty(self, p):
         "array_expression : '[' empty ']'"
-        p[0] = ArrayExpression([])
+        p[0] = ArrayExpression([], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_array_elements_literal(self, p):
         """array_elements_literal : array_elements_literal ',' expression
@@ -392,7 +395,8 @@ class Parser():
             print(f"Index '{p[3].value()}' out of range for array of length {p[1].type().type().length()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = IndexExpression(p[1], p[3])
+        p[0] = IndexExpression(p[1], p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_call_expression(self, p):
         """call_expression : IDENTIFIER '(' call_params ',' ')'
@@ -403,7 +407,8 @@ class Parser():
             print(f"Call parameter types do not match function parameter types in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
-        p[0] = CallExpression(p[1], p[3], self.__dir_func)
+        p[0] = CallExpression(p[1], p[3], self.__dir_func, self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_call_expression_empty(self, p):
         "call_expression : IDENTIFIER '(' empty ')'"
@@ -413,7 +418,8 @@ class Parser():
             print(f"Call parameter types do not match function parameter types in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = CallExpression(p[1], [], self.__dir_func)
+        p[0] = CallExpression(p[1], [], self.__dir_func, self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_call_params(self, p):
         """call_params : call_params ',' expression
@@ -427,10 +433,12 @@ class Parser():
     def p_continue_expression(self, p):
         "continue_expression : CONTINUE"
         p[0] = ContinueExpression()
+        self.__quadruples += p[0].quadruples()
     
     def p_break_expression(self, p):
         "break_expression : BREAK"
         p[0] = BreakExpression()
+        self.__quadruples += p[0].quadruples()
 
     def p_return_expression(self, p):
         "return_expression : RETURN expression"
@@ -440,6 +448,7 @@ class Parser():
             sys.exit(1)
         
         p[0] = ReturnExpression(p[2])
+        self.__quadruples += p[0].quadruples()
 
     def p_return_expression_empty(self, p):
         "return_expression : RETURN empty"
@@ -449,6 +458,7 @@ class Parser():
             sys.exit(1)
 
         p[0] = ReturnExpression(None)
+        self.__quadruples += p[0].quadruples()
     
     def p_special_function_expression(self, p):
         """special_function_expression : io_expression
@@ -471,6 +481,7 @@ class Parser():
             sys.exit(1)
         
         p[0] = ReadExpression(p[3])
+        self.__quadruples += p[0].quadruples()
 
     def p_write_expression(self, p):
         "write_expression : WRITE '(' expression ')'"
@@ -480,6 +491,7 @@ class Parser():
             sys.exit(1)
         
         p[0] = WriteExpression(p[3])
+        self.__quadruples += p[0].quadruples()
     
     def p_write_expression_error(self, p):
         "write_expression : WRITE '(' error ')'"
@@ -515,6 +527,7 @@ class Parser():
             sys.exit(1)
         
         p[0] = PlotExpression(p[3], p[5])
+        self.__quadruples += p[0].quadruples()
     
     def p_scatter_expression(self, p):
         "scatter_expression : SCATTER '(' expression ',' expression ')'"
@@ -528,6 +541,7 @@ class Parser():
             sys.exit(1)
         
         p[0] = ScatterExpression(p[3], p[5])
+        self.__quadruples += p[0].quadruples()
     
     def p_histogram_expression(self, p):
         "histogram_expression : HISTOGRAM '(' expression ')'"
@@ -537,6 +551,7 @@ class Parser():
             sys.exit(1)
         
         p[0] = HistogramExpression(p[3])
+        self.__quadruples += p[0].quadruples()
     
     def p_mean_expression(self, p):
         "mean_expression : MEAN '(' expression ')'"
@@ -549,7 +564,8 @@ class Parser():
             print(f"Second parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = MeanExpression(p[3])
+        p[0] = MeanExpression(p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_median_expression(self, p):
         "median_expression : MEDIAN '(' expression ')'"
@@ -558,7 +574,8 @@ class Parser():
             print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = MedianExpression(p[3])
+        p[0] = MedianExpression(p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_mean_square_expression(self, p):
         "mean_square_error_expression : MEAN_SQUARE_ERROR '(' expression ')'"
@@ -567,7 +584,8 @@ class Parser():
             print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = MeanSquareErrorExpression(p[3])
+        p[0] = MeanSquareErrorExpression(p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_min_expression(self, p):
         "min_expression : MIN '(' expression ')'"
@@ -576,7 +594,8 @@ class Parser():
             print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = MinExpression(p[3])
+        p[0] = MinExpression(p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_max_expression(self, p):
         "max_expression : MAX '(' expression ')'"
@@ -585,7 +604,8 @@ class Parser():
             print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = MaxExpression(p[3])
+        p[0] = MaxExpression(p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_standard_deviation_expression(self, p):
         "standard_deviation_expression : STANDARD_DEVIATION '(' expression ')'"
@@ -594,7 +614,8 @@ class Parser():
             print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = StandardDeviationExpression(p[3])
+        p[0] = StandardDeviationExpression(p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_variance_expression(self, p):
         "variance_expression : VARIANCE '(' expression ')'"
@@ -603,7 +624,8 @@ class Parser():
             print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = VarianceExpression(p[3])
+        p[0] = VarianceExpression(p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_skewness_expression(self, p):
         "skewness_expression : SKEWNESS '(' expression ')'"
@@ -612,7 +634,8 @@ class Parser():
             print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = SkewnessExpression(p[3])
+        p[0] = SkewnessExpression(p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_kurtosis_expression(self, p):
         "kurtosis_expression : KURTOSIS '(' expression ')'"
@@ -621,7 +644,8 @@ class Parser():
             print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = KurtosisExpression(p[3])
+        p[0] = KurtosisExpression(p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_r_squared_expression(self, p):
         "r_squared_expression : R_SQUARED '(' expression ',' expression ')'"
@@ -634,7 +658,8 @@ class Parser():
             print(f"Second parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = RSquaredExpression(p[3], p[5])
+        p[0] = RSquaredExpression(p[3], p[5], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_sum_expression(self, p):
         "sum_expression : SUM '(' expression ')'"
@@ -643,7 +668,8 @@ class Parser():
             print(f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = SumExpression(p[3])
+        p[0] = SumExpression(p[3], self.__temp_var_generator)
+        self.__quadruples += p[0].quadruples()
     
     def p_loop_expression(self, p):
         """loop_expression : infinite_loop_expression

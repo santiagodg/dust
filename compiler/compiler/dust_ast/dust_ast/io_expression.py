@@ -31,8 +31,7 @@ class IoExpression:
         :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
         """
         
-        print(f"{self.__class__.__name__}.operand: Not yet implemented")
-        return None
+        return self.__expression.operand()
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

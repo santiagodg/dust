@@ -21,16 +21,24 @@ class PredicateLoopExpression:
         result += f'{space_padding}{space_indent}block: {block_str}'
         return result
     
-    def type(self):
-        return None
-    
     def operand(self):
         """
         :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
         """
-        
-        print(f"{self.__class__.__name__}.operand: Not yet implemented")
+
         return None
+    
+    def quadruples(self):
+        """
+        :rtype: List[Tuple[str, str, str, str]]
+        """
+
+        return [(
+            f'{type(self).__name__} unimplemented', 
+            '', 
+            '',
+            ''
+        )]
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

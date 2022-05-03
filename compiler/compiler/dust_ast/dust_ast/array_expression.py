@@ -6,11 +6,12 @@ from .array_type import ArrayType
 from .integer_literal import IntegerLiteral
 
 class ArrayExpression:
-    def __init__(self, array_elements):
+    def __init__(self, array_elements, temp_var_generator):
         "array_elements: list[Expression]"
         self.__array_elements = array_elements
         self.__elements_type = self.__array_elements[0].type()
         self.__type = Type(ArrayType(self.__elements_type, IntegerLiteral(len(self.__array_elements))))
+        self.__temporary_variable = temp_var_generator.next()
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -39,8 +40,19 @@ class ArrayExpression:
         :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
         """
 
-        print(f"{self.__class__.__name__}.operand: Not yet implemented")
-        return None
+        return self.__temporary_variable
+    
+    def quadruples(self):
+        """
+        :rtype: List[Tuple[str, str, str, str]]
+        """
+
+        return [(
+            f'{type(self).__name__} unimplemented', 
+            '', 
+            '',
+            self.__temporary_variable
+        )]
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__
