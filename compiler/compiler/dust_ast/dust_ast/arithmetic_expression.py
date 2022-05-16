@@ -52,12 +52,12 @@ class ArithmeticExpression:
         left_expression_temporary_variable = self.__left_expression.operand()
         right_expression_temporary_variable = self.__right_expression.operand()
 
-        return [(
+        return [[
             self.__operator, 
             left_expression_temporary_variable, 
             right_expression_temporary_variable,
             self.__temporary_variable
-        )]
+        ]]
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

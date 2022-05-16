@@ -1,0 +1,17 @@
+fn main()
+let a: i32;
+let b: i32;
+let c: i32;
+let d: i32;
+let e: i32;
+let f: f64;
+{
+    a = 1;
+    b = 2;
+    c = 3;
+    d = 4;
+    e = 5;
+    f = 6.6;
+
+    a = b + c - d * e - a / c + d % e;
+}

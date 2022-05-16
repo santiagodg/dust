@@ -34,12 +34,12 @@ class AssignmentExpression:
         left_expression_temporary_variable = self.__left_expression.operand()
         right_expression_temporary_variable = self.__right_expression.operand()
 
-        return [(
+        return [[
             '=', 
             right_expression_temporary_variable, 
-            '',
+            None,
             left_expression_temporary_variable
-        )]
+        ]]
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

@@ -59,8 +59,8 @@ class CallExpression:
 
         return [(
             f'{type(self).__name__} unimplemented', 
-            '', 
-            '',
+            None, 
+            None,
             self.__temporary_variable
         )]
 

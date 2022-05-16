@@ -1,0 +1,5 @@
+static name_1: i32;
+
+fn name_1() {}
+
+fn main() {}

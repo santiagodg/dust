@@ -38,12 +38,12 @@ class ScatterExpression:
         :rtype: List[Tuple[str, str, str, str]]
         """
 
-        return [(
+        return [[
             f'{type(self).__name__} unimplemented', 
-            '', 
-            '',
-            ''
-        )]
+            None,
+            None,
+            None,
+        ]]
 
     def __eq__(self, other) : 
         return self.__dict__ == other.__dict__

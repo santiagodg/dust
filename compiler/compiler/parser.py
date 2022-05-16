@@ -181,6 +181,7 @@ class Parser():
     def p_expression_error(self, p):
         """expression : error"""
         print(f"Syntax error in expression. Bad subexpression on lines {p.linespan(1)[0]}-{p.linespan(1)[1]}")
+        sys.exit(1)
     
     def p_expression_without_block_not_identifier(self, p):
         """expression_without_block : literal_expression
@@ -243,11 +244,11 @@ class Parser():
                                | '!' expression"""
         
         if not p[2].type().is_primitive():
-            print(f"Cannot apply unary '{p[1]}' operator non-primitive type {p[2].type()} expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply unary '{p[1]}' operator non-primitive type {p[2].type().canonical()} expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         if self.__semantic_cube.search_unary_operation(p[1], p[2].type().type()) == None: 
-            print(f"Cannot apply unary '{p[1]}' operator to type {p[2].type()} expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply unary '{p[1]}' operator to type {p[2].type().canonical()} expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = NegationExpression(p[1], p[2], self.__semantic_cube, self.__temp_var_generator)
@@ -261,15 +262,15 @@ class Parser():
                                  | expression '%' expression"""
 
         if not p[1].type().is_primitive():
-            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type()} left expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type().canonical()} left expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
         if not p[3].type().is_primitive():
-            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type()} rigth expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type().canonical()} rigth expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         if self.__semantic_cube.search_binary_operation(p[1].type().type(), p[2], p[3].type().type()) == None:
-            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type().canonical()} left expression and {p[3].type().canonical()} right expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
         p[0] = ArithmeticExpression(p[1], p[2], p[3], self.__semantic_cube, self.__temp_var_generator)
@@ -284,15 +285,15 @@ class Parser():
                                  | expression LE expression"""
                                 
         if not p[1].type().is_primitive():
-            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type()} left expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type().canonical()} left expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
         if not p[3].type().is_primitive():
-            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type()} rigth expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type().canonical()} rigth expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         if self.__semantic_cube.search_binary_operation(p[1].type().type(), p[2], p[3].type().type()) == None:
-            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type().canonical()} left expression and {p[3].type().canonical()} right expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
         p[0] = ComparisonExpression(p[1], p[2], p[3], self.__semantic_cube, self.__temp_var_generator)
@@ -303,15 +304,15 @@ class Parser():
                               | expression AND expression"""
         
         if not p[1].type().is_primitive():
-            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type()} left expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type().canonical()} left expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
         if not p[3].type().is_primitive():
-            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type()} rigth expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type().canonical()} rigth expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         if self.__semantic_cube.search_binary_operation(p[1].type().type(), p[2], p[3].type().type()) == None:
-            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type().canonical()} left expression and {p[3].type().canonical()} right expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
         p[0] = BooleanExpression(p[1], p[2], p[3], self.__semantic_cube, self.__temp_var_generator)
@@ -321,25 +322,21 @@ class Parser():
         "type_cast_expression : expression AS type"
 
         if not p[1].type().is_primitive():
-            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type()} left expression in line {self.lexer.lexer.lineno}")
-            sys.exit(1)
-        
-        if not p[3].type().is_primitive():
-            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[3].type()} rigth expression in line {self.lexer.lexer.lineno}")
+            print(f"Cannot apply binary '{p[2]}' operator to non-primitive type {p[1].type().canonical()} left expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
-        if self.__semantic_cube.search_binary_operation(p[1].type().type(), p[2], p[3].type().type()) == None:
-            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type()} left expression and {p[3].type()} right expression in line {self.lexer.lexer.lineno}")
+        if self.__semantic_cube.search_binary_operation(p[1].type().type(), p[2], p[3].type()) == None:
+            print(f"Cannot apply binary '{p[2]}' operator to type {p[1].type().canonical()} left expression and {p[3].canonical()} right expression in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
-        p[0] = TypeCastExpression(p[1], p[3])
+        p[0] = TypeCastExpression(p[1], p[3], self.__temp_var_generator)
         self.__quadruples += p[0].quadruples()
     
     def p_assignment_expression(self, p):
         "assignment_expression : expression '=' expression"
 
         if p[1].type() != p[3].type():
-            print(f"Cannot assign right expression of type {p[3].type()} to left expression of type {p[1].type()} in line {self.lexer.lexer.lineno}")
+            print(f"Cannot assign right expression of type {p[3].type().canonical()} to left expression of type {p[1].type().canonical()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = AssignmentExpression(p[1], p[3])
@@ -369,7 +366,7 @@ class Parser():
             p[0] = [p[1]]
         else:
             if p[3].type() != self.__temp_array_elements_literal_type:
-                print(f"Cannot add expression of type {p[3].type()} to literal array expression of type {self.__temp_array_elements_literal_type} in line {self.lexer.lexer.lineno}")
+                print(f"Cannot add expression of type {p[3].type().canonical()} to literal array expression of type {self.__temp_array_elements_literal_type} in line {self.lexer.lexer.lineno}")
                 sys.exit(1)
             
             p[0] = p[1] + [p[3]]
@@ -388,7 +385,7 @@ class Parser():
         "index_expression : expression '[' INTEGER_LITERAL ']'"
 
         if not p[1].type().is_array():
-            print(f"Cannot perform indexing for expression of type {p[1].type()} in line {self.lexer.lexer.lineno}")
+            print(f"Cannot perform indexing for expression of type {p[1].type().canonical()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         
         if p[3].value() < 0 or p[1].type().type().length() >= p[3].value():
@@ -444,7 +441,7 @@ class Parser():
         "return_expression : RETURN expression"
 
         if self.__dir_func.function_entry(self.__temp_function_identifier).return_type() != p[2].type():
-            print(f"Return expression of type {p[2].type()} does not match function declaration return type {self.__dir_func.function_entry(self.__temp_function_identifier).return_type()}")
+            print(f"Return expression of type {p[2].type().canonical()} does not match function declaration return type {self.__dir_func.function_entry(self.__temp_function_identifier).return_type().canonical() if self.__dir_func.function_entry(self.__temp_function_identifier).return_type() != None else None}")
             sys.exit(1)
         
         p[0] = ReturnExpression(p[2])
@@ -454,7 +451,7 @@ class Parser():
         "return_expression : RETURN empty"
 
         if self.__dir_func.function_entry(self.__temp_function_identifier).return_type() != None:
-            print(f"Return expression of type {p[2].type()} does not match function declaration return type {self.__dir_func.function_entry(self.__temp_function_identifier).return_type()}")
+            print(f"Return expression of type {p[2].type().canonical()} does not match function declaration return type {self.__dir_func.function_entry(self.__temp_function_identifier).return_type().canonical() if self.__dir_func.function_entry(self.__temp_function_identifier).return_type() != None else None}")
             sys.exit(1)
 
         p[0] = ReturnExpression(None)
@@ -678,35 +675,111 @@ class Parser():
         p[0] = LoopExpression(p[1])
     
     def p_infinite_loop_expression(self, p):
-        "infinite_loop_expression : LOOP block_expression"
-        p[0] = InfiniteLoopExpression(p[2])
+        "infinite_loop_expression : LOOP infinite_loop_expression_point_1 block_expression infinite_loop_expression_point_2"
+        p[0] = InfiniteLoopExpression(p[3])
+    
+    def p_infinite_loop_expression_point_1(self, p):
+        "infinite_loop_expression_point_1 :"
+        self.__infinite_loop_expression_start.append(len(self.__quadruples))
+    
+    def p_infinite_loop_expression_point_2(self, p):
+        "infinite_loop_expression_point_2 :"
+
+        self.__quadruples += [[
+            'Goto', 
+            None, 
+            None, 
+            self.__infinite_loop_expression_start.pop()
+        ]]
     
     def p_predicate_loop_expression(self, p):
-        "predicate_loop_expression : WHILE expression block_expression"
+        "predicate_loop_expression : WHILE predicate_loop_expression_point_1 expression predicate_loop_expression_point_2 block_expression predicate_loop_expression_point_3"
 
-        if p[2].type() != Type(PrimitiveType('bool')):
-            print(f"While condition must evaluate to a boolean value")
+        if p[3].type() != Type(PrimitiveType('bool')):
+            print(f"While condition must evaluate to bool")
             sys.exit(1)
         
-        p[0] = PredicateLoopExpression(p[2], p[3])
+        p[0] = PredicateLoopExpression(p[3], p[5])
+    
+    def p_predicate_loop_expression_point_1(self, p):
+        "predicate_loop_expression_point_1 :"
+        self.__predicate_loop_expression_start.append(len(self.__quadruples))
+    
+    def p_predicate_loop_expression_point_2(self, p):
+        "predicate_loop_expression_point_2 :"
+
+        self.__predicate_loop_expression_goto_f.append(len(self.__quadruples))
+        
+        self.__quadruples += [[
+            'GotoF',
+            p[-1].operand(),
+            None,
+            None,
+        ]]
+    
+    def p_predicate_loop_expression_point_3(self, p):
+        "predicate_loop_expression_point_3 :"
+
+        self.__quadruples += [[
+            'Goto',
+            None,
+            None,
+            self.__predicate_loop_expression_start.pop()
+        ]]
+        
+        goto_f = self.__predicate_loop_expression_goto_f.pop()
+        self.__quadruples[goto_f][3] = len(self.__quadruples)
+
+    
     
     def p_if_expression(self, p):
-        """if_expression : IF expression block_expression ELSE block_expression"""
+        """if_expression : IF expression if_expression_point_1 block_expression ELSE if_expression_point_2 block_expression if_expression_point_3
+                         | IF expression if_expression_point_1 block_expression empty if_expression_without_else_point_2 empty empty"""
 
         if p[2].type() != Type(PrimitiveType('bool')):
-            print(f"If condition must evaluate to a boolean value")
+            print(f"If condition must evaluate to bool")
             sys.exit(1)
         
-        p[0] = IfExpression(p[2], p[3], p[5])
+        p[0] = IfExpression(p[2], p[4], p[7])
     
-    def p_if_expression_without_else(self, p):
-        """if_expression : IF expression block_expression"""
+    def p_if_expression_point_1(self, p):
+        "if_expression_point_1 :"
 
-        if p[2].type() != Type(PrimitiveType('bool')):
-            print(f"If condition must evaluate to a boolean value")
-            sys.exit(1)
-        
-        p[0] = IfExpression(p[2], p[3], None)
+        self.__if_expression_goto_f.append(len(self.__quadruples))
+
+        self.__quadruples += [[
+            'GotoF',
+            p[-1].operand(),
+            None,
+            None,
+        ]]
+    
+    def p_if_expression_point_2(self, p):
+        "if_expression_point_2 :"
+
+        self.__if_expression_goto_t.append(len(self.__quadruples))
+
+        self.__quadruples += [[
+            'Goto',
+            None,
+            None,
+            None,
+        ]]
+
+        goto_f = self.__if_expression_goto_f.pop()
+        self.__quadruples[goto_f][3] = len(self.__quadruples)
+    
+    def p_if_expression_point_3(self, p):
+        "if_expression_point_3 :"
+
+        goto_t = self.__if_expression_goto_t.pop()
+        self.__quadruples[goto_t][3] = len(self.__quadruples)
+    
+    def p_if_expression_without_else_point_2(self, p):
+        "if_expression_without_else_point_2 :"
+
+        goto_f = self.__if_expression_goto_f.pop()
+        self.__quadruples[goto_f][3] = len(self.__quadruples)
 
     def p_type(self, p):
         """type : primitive_type
@@ -738,6 +811,7 @@ class Parser():
     def p_error(self, p):
         print("Syntax error in input!")
         print(f"Illegal token {p} at line {self.lexer.lexer.lineno}")
+        sys.exit(1)
     
     def __init__(self, lexer, dir_func: DirFunc, semantic_cube: SemanticCube, quadruples, **kwargs):
         self.lexer = lexer
@@ -746,6 +820,11 @@ class Parser():
         self.__temp_function_identifier = None
         self.__quadruples = quadruples
         self.__temp_var_generator = TemporaryVariableGenerator()
+        self.__infinite_loop_expression_start = []
+        self.__predicate_loop_expression_start = []
+        self.__predicate_loop_expression_goto_f = []
+        self.__if_expression_goto_f = []
+        self.__if_expression_goto_t = []
         self.parser = yacc.yacc(module=self, **kwargs)
     
     def restart(self):
@@ -758,8 +837,10 @@ class Parser():
         Panics if it encounters an error. Writes to stdout an error message
         befor exiting.
 
-        :param data: str. The input to parse.
-        :return: Crate. The abstract syntax tree.
+        :param data: The input to parse.
+        :type data: str
+        :return: The abstract syntax tree.
+        :rtype: Crate
         """
 
         return self.parser.parse(data, lexer=self.lexer.lexer)

@@ -1,0 +1,11 @@
+fn main()
+let integer: i32;
+let floating: f64;
+let character: char;
+let boolean: bool;
+{
+    integer = 1;
+    floating = integer as f64;
+    floating = floating + 1.0;
+    integer = floating as i32;
+}

@@ -1,42 +1,39 @@
+import sys
+
 from compiler import Lexer, Parser, Compiler, DirFunc, SemanticCube, pretty_print_quadruples
 
-l = Lexer()
-dir_func = DirFunc()
-semantic_cube = SemanticCube()
-quadruples = []
-p = Parser(l, dir_func, semantic_cube, quadruples)
-c = Compiler(p, dir_func, semantic_cube)
+def main():
 
-result = c.test(
-"""
-static global_1: bool;
+    l = Lexer()
+    dir_func = DirFunc()
+    semantic_cube = SemanticCube()
+    quadruples = []
+    p = Parser(l, dir_func, semantic_cube, quadruples)
+    c = Compiler(p, dir_func, semantic_cube)
 
-fn main()
-let local_1: i32;
-let local_2: i32;
-let local_char: char;
-let local_arr: [f64; 2];
-{
-    global_1 = true;
-    local_1 = 2;
-    local_2 = 3;
-    local_char = 'a';
-    local_arr = [4.4; 2];
+    if len(sys.argv) != 2:
+        print(f'''{sys.argv[0]} must be called with 1 argument:
+    {sys.argv[0]} <filename>        Compiles the specified file.
+    {sys.argv[0]} -                 Reads from stdin the source code to compile.
+    {' ' * len(sys.argv[0])}                   To end, enter Ctrl+Z.''')
+        return
+    
+    source_code = ''
+    if sys.argv[1] == '-':
+        source_code = sys.stdin.read()
+    else:
+        with open(sys.argv[1], 'r') as file:
+            source_code = file.read()
 
-    if global_1 {
-        local_1 = local_1 + local_2;
-    } else {
-        local_1 = local_1 - local_2;
-    };
+    result = c.test(source_code)
 
-    write(local_char);
-}
-""")
+    # print()
+    # print(result)
+    # print()
+    # print(dir_func)
 
-# print()
-# print(result)
-# print()
-# print(dir_func)
+    print()
+    pretty_print_quadruples(quadruples)
 
-print()
-pretty_print_quadruples(quadruples)
+if __name__ == '__main__':
+    main()

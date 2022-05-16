@@ -13,7 +13,7 @@ class SemanticCube:
         char = PrimitiveType('char')
 
         # operators
-        unary_minus = '-'
+        unary_minus = 'uminus'
         unary_boolean_negation = '!'
         as_operator = 'as'
         multiplication = '*'

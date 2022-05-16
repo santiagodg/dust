@@ -26,9 +26,9 @@ class BreakExpression:
 
         return [(
             f'{type(self).__name__} unimplemented', 
-            '', 
-            '',
-            ''
+            None, 
+            None,
+            None
         )]
 
     def __eq__(self, other) : 
