@@ -20,7 +20,7 @@ class BooleanExpression:
         if return_type != None:
             self.__type = Type(return_type)
         
-        self.__temporary_variable = temp_var_generator.next()
+        self.__temporary_variable = temp_var_generator.next(self.__type)
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

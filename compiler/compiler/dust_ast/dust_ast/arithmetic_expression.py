@@ -15,12 +15,14 @@ class ArithmeticExpression:
         self.__left_expression = left_expression
         self.__operator = operator
         self.__right_expression = right_expression
-        self.__temporary_variable = temp_var_generator.next()
 
         self.__type: Optional[Type] = None
         return_type = semantic_cube.search_binary_operation(self.__left_expression.type().type(), self.__operator, self.__right_expression.type().type())
         if return_type != None:
             self.__type = Type(return_type)
+        
+        self.__temporary_variable = temp_var_generator.next(self.__type)
+
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

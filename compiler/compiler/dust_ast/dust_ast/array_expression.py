@@ -11,7 +11,7 @@ class ArrayExpression:
         self.__array_elements = array_elements
         self.__elements_type = self.__array_elements[0].type()
         self.__type = Type(ArrayType(self.__elements_type, IntegerLiteral(len(self.__array_elements))))
-        self.__temporary_variable = temp_var_generator.next()
+        self.__temporary_variable = temp_var_generator.next(self.__type)
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

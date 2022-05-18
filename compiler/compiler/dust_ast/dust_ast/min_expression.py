@@ -9,7 +9,7 @@ class MinExpression:
         "expression: Expression"
         self.__expression = expression
         self.__type = Type(PrimitiveType('f64'))
-        self.__temporary_variable = temp_var_generator.next()
+        self.__temporary_variable = temp_var_generator.next(self.__type)
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

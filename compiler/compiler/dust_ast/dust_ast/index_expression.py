@@ -13,7 +13,7 @@ class IndexExpression:
         self.__expression = expression
         self.__index = index
         self.__type = self.__expression.type().type().type()
-        self.__temporary_variable = temp_var_generator.next()
+        self.__temporary_variable = temp_var_generator.next(self.__type)
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

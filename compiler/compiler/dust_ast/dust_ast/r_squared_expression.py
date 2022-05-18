@@ -14,7 +14,7 @@ class RSquaredExpression:
         self.__expression_0 = expression_0
         self.__expression_1 = expression_1
         self.__type = Type(PrimitiveType('f64'))
-        self.__temporary_variable = temp_var_generator.next()
+        self.__temporary_variable = temp_var_generator.next(self.__type)
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

@@ -23,7 +23,7 @@ def pretty_print_quadruples(quadruples):
                 result += f'{quadruple[i].value()}, '
                 continue
 
-            result += str(quadruple[i])
+            result += f'{str(quadruple[i])}, '
         
         if quadruple[3] == None:
             result += 'None'

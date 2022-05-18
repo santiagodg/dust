@@ -1,0 +1,15 @@
+fn uno() -> i32 {
+    return 1;
+}
+
+fn dos(a: i32, b: i32) -> i32 {
+    return a + b;
+}
+
+fn main()
+let resultado_1: i32;
+let resultado_2: i32;
+{
+    resultado_1 = uno();
+    resultado_2 = dos(2, 3);
+}

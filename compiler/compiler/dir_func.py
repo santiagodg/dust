@@ -1,85 +1,109 @@
-import copy
-from typing import Optional, Tuple
+"""Save function information.
 
-from .dust_ast import Function, Identifier, StaticItem, FunctionParameter, PrimitiveType, LetStatement, Type
+# Exported classes
+
+DirFunc: Function directory holding static variables and function information.
+
+DirFuncError: Error type returned by DirFunc class.
+
+FunctionEntry: Holds information of a function.
+"""
+
+import copy
+from typing import Optional
+import sys
+
+from .dust_ast import Identifier, StaticItem, FunctionParameter, PrimitiveType, LetStatement, Type
+
 
 class DirFuncError:
-    def __init__(self, type: str, message: str):
-        self.__type = type
+    """Error type returned by DirFunc class.
+
+    # Methods
+
+    type(): Get the type of error.
+
+    message(): Get the error message.
+    """
+
+    def __init__(self, error_type: str, message: str):
+        """Construct a DirFuncError with type and message.
+
+        :param error_type: The type of error.
+        :type error_type: str
+        :param message: Error message.
+        :type message: str
+        """
+        self.__type = error_type
         self.__message = message
-    
+
     def type(self) -> str:
         return copy.deepcopy(self.__type)
-    
+
     def message(self) -> str:
         return copy.deepcopy(self.__message)
 
-class Variable:
-    def __init__(self, identifier: Identifier, type: Type):
-        self.__identifier = identifier
-        self.__type = type
-
-    def identifier(self) -> Identifier:
-        return copy.deepcopy(self.__identifier)
-    
-    def type(self) -> Identifier:
-        return copy.deepcopy(self.__type)
-    
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        result = f'{type(self).__name__}('
-        attr_str = []
-        for key, value in vars(self).items():
-            prefix = key.replace(f"_{type(self).__name__}", '')
-            attr_str += [f'{prefix}={str(value)}']
-        result += ','.join(attr_str)
-        result += ')'
-        return result
 
 class FunctionEntry:
     def __init__(
-            self,
-            identifier: Identifier,
-            parameters: dict[str, FunctionParameter] = {},
-            return_type: Optional[PrimitiveType] = None,
-            let_statements: dict[str, LetStatement] = {}):
+        self,
+        identifier: Identifier,
+        parameters: dict[str, FunctionParameter] = {},
+        return_type: Optional[PrimitiveType] = None,
+        let_statements: dict[str, LetStatement] = {},
+        temporary_variables_count: dict[str, int] = {},
+        start_quadruple_index: int = -1,
+    ):
 
         self.__identifier = identifier
         self.__parameters = parameters
         self.__return_type = return_type
         self.__let_statements = let_statements
-    
+        self.__temporary_variables_count = temporary_variables_count
+        self.__start_quadruple_index = start_quadruple_index
+
     def exists_identifier(self, variable_identifier: Identifier) -> bool:
         return variable_identifier.identifier() in self.__parameters.keys() ^ self.__let_statements.keys()
-    
+
     def add_parameter(self, parameter: FunctionParameter):
         self.__parameters[parameter.identifier().identifier()] = parameter
 
     def add_let_statement(self, let_statement: LetStatement):
-        self.__let_statements[let_statement.identifier().identifier()] = let_statement
-    
+        self.__let_statements[let_statement.identifier(
+        ).identifier()] = let_statement
+
     def set_return_type(self, return_type: PrimitiveType):
         self.__return_type = return_type
-    
+
     def return_type(self) -> Optional[PrimitiveType]:
         return copy.deepcopy(self.__return_type)
-    
+
     def identifier(self) -> Identifier:
         return copy.deepcopy(self.__identifier)
-    
+
     def parameter_type_list(self) -> list[Type]:
         return copy.deepcopy(list(map(lambda parameter: parameter.type(), list(self.__parameters.values()))))
-    
+
     def get_typed_local_identifier(self, identifier: Identifier) -> Optional[Identifier]:
         if identifier.identifier() in self.__parameters:
             return copy.deepcopy(self.__parameters[identifier.identifier()].identifier())
-        
+
         if identifier.identifier() in self.__let_statements:
             return copy.deepcopy(self.__let_statements[identifier.identifier()].identifier())
-        
+
         return None
+
+    def get_temporary_variable_count(self) -> dict[str, int]:
+        return copy.deepcopy(self.__temporary_variables_count)
+
+    def set_temporary_variable_count(self, count: dict[str, int]):
+        self.__temporary_variables_count = copy.deepcopy(count)
+
+    def get_start_quadruple_index(self) -> int:
+        return self.__start_quadruple_index
+
+    def set_start_quadruple_index(self, index: int):
+        self.__start_quadruple_index = index
 
     def __repr__(self):
         return self.__str__()
@@ -94,8 +118,14 @@ class FunctionEntry:
         result += ')'
         return result
 
+
 class DirFunc:
-    def __init__(self, static_items: dict[str, StaticItem] = {}, functions: dict[str, FunctionEntry] = {}):
+    def __init__(
+        self,
+        static_items: dict[str, StaticItem] = {},
+        functions: dict[str, FunctionEntry] = {},
+    ):
+
         self.__static_items = static_items
         self.__functions = functions
 
@@ -104,43 +134,46 @@ class DirFunc:
 
         if identifier_str in self.__static_items.keys() ^ self.__functions.keys():
             return DirFuncError(
-                type='MultipleDeclaration', 
+                error_type='MultipleDeclaration',
                 message=f"Multiple declaration for '{identifier_str}' identifier"
             )
 
         self.__static_items[identifier_str] = copy.deepcopy(static_item)
         return None
-    
+
     def add_function_identifier(self, identifier: Identifier):
         self.__functions[identifier.identifier()] = FunctionEntry(identifier)
-    
+
     def add_function_parameter(self, function_identifier: Identifier, function_parameter: FunctionParameter):
-        self.__functions[function_identifier.identifier()].add_parameter(function_parameter)
-    
+        self.__functions[function_identifier.identifier()].add_parameter(
+            function_parameter)
+
     def add_function_return_type(self, function_identifier: Identifier, return_type: PrimitiveType):
-        self.__functions[function_identifier.identifier()].set_return_type(return_type)
-    
+        self.__functions[function_identifier.identifier()
+                         ].set_return_type(return_type)
+
     def add_function_let_statement(self, function_identifier: Identifier, let_statement: LetStatement):
-        self.__functions[function_identifier.identifier()].add_let_statement(let_statement)
-    
+        self.__functions[function_identifier.identifier()].add_let_statement(
+            let_statement)
+
     def exists_in_var_tables(
-            self, 
-            function_identifier: Identifier, 
+            self,
+            function_identifier: Identifier,
             variable_identifier: Identifier) -> bool:
 
         if function_identifier.identifier() not in self.__functions:
             return False
-        
+
         function_entry = self.__functions[function_identifier.identifier()]
 
         return function_entry.exists_identifier(variable_identifier)
 
     def exists(self, identifier: Identifier) -> bool:
         return identifier.identifier() in (self.__functions.keys() ^ self.__static_items.keys())
-    
+
     def exists_function(self, identifier: Identifier) -> bool:
         return identifier.identifier() in self.__functions.keys()
-    
+
     def get_typed_local_or_static_identifier(self, function_identifier: Identifier, identifier: Identifier) -> Optional[Type]:
         """
         Returns a typed local or static identifier.
@@ -155,25 +188,42 @@ class DirFunc:
 
         if identifier.identifier() in self.__static_items.keys():
             return copy.deepcopy(self.__static_items[identifier.identifier()].identifier())
-        
+
         if function_identifier.identifier() in self.__functions:
             function_entry = self.__functions[function_identifier.identifier()]
 
             if function_entry.exists_identifier(identifier):
                 return function_entry.get_typed_local_identifier(identifier)
-        
+
         return None
 
-    
     def function_parameters_match(self, function_identifier: Identifier, parameter_types: list[Type]) -> bool:
         for p1, p2 in zip(parameter_types, self.__functions[function_identifier.identifier()].parameter_type_list()):
             if p1 != p2:
                 return False
-        
+
         return True
-    
+
     def function_entry(self, function_identifier: Identifier) -> FunctionEntry:
         return self.__functions[function_identifier.identifier()]
+
+    def add_temporary_variable_count(self, function_identifier: Identifier, count: dict[str, int]):
+        if function_identifier.identifier() not in self.__functions:
+            print(
+                f'DirFunc.add_temporary_variable_count(function_identifier={function_identifier}, count={count}): function_identifier does not have a corresponding function registered.')
+            sys.exit(1)
+
+        self.__functions[function_identifier.identifier(
+        )].set_temporary_variable_count(count)
+
+    def set_function_start_quadruple_index(self, function_identifier: Identifier, index: int):
+        if function_identifier.identifier() not in self.__functions:
+            print(
+                f'DirFunc.set_function_start_quadruple_index(function_identifier={function_identifier}, index={index}): function_identifier does not have a corresponding function registered.')
+            sys.exit(1)
+
+        self.__functions[function_identifier.identifier(
+        )].set_start_quadruple_index(index)
 
     def __repr__(self):
         return self.__str__()
@@ -187,7 +237,7 @@ class DirFunc:
         result += ','.join(attr_str)
         result += ')'
         return result
-    
+
     def __eq__(self, other):
         if not isinstance(other, DirFunc):
             return False
