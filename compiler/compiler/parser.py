@@ -94,14 +94,14 @@ class Parser():
     def p_static_item(self, p):
         "static_item : STATIC IDENTIFIER static_item_check_id ':' type ';'"
         static_item = StaticItem(p[2], p[5])
-        error = self.__dir_func.add_static_item(static_item)
+        self.__dir_func.add_static_item(static_item)
         p[0] = static_item
 
     def p_static_item_check_id(self, p):
         "static_item_check_id :"
         if self.__dir_func.exists(p[-1]):
             print(f"Multiple declaration: identifier '{p[-1].identifier()}'")
-            raise SyntaxError
+            sys.exit(1)
 
     def p_function(self, p):
         """function : FN IDENTIFIER function_point_1 '(' function_parameters ')' function_return_type function_point_2 let_statements function_point_3 block_expression
