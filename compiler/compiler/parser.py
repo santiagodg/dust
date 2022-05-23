@@ -8,15 +8,37 @@ from .lexer import Lexer
 from .dir_func import DirFunc
 from .semantic_cube import SemanticCube
 from .dust_ast import *
+from .virtual_address import Scope
 
 
 class TemporaryVariable:
-    def __init__(self, number: int, var_type: Type):
+    def __init__(self, number: int, var_type: Type, virtual_address):
+        """Construct a TemporaryVariable object.
+
+        Parameters
+        ----------
+        number : int
+            The unique number to identifiy this temporary variable.
+        var_type : Type
+            The type of this variable.
+        virtual_address : VirtualAddress
+            This temporary variable's virtual address."""
         self.__number = number
         self.__type = var_type
+        self.__virtual_address = virtual_address
 
     def number(self) -> int:
         return self.__number
+
+    def virtual_address(self):
+        """Return this temporary variable's virtual address.
+
+        Returns
+        -------
+        virtual_address : VirtualAddress
+            This temporary variable's virtual address.
+        """
+        return copy.deepcopy(self.__virtual_address)
 
     def __repr__(self):
         return self.__str__()
@@ -33,12 +55,23 @@ class TemporaryVariable:
 
 
 class TemporaryVariableGenerator:
-    def __init__(self):
+    def __init__(self, virtual_address_controller):
+        """Construct a TemporaryVariableGenerator object.
+
+        Parameters
+        ----------
+        virtual_address_controller : VirtualAddressControllerInterface
+            The controller which releases virtual addresses on demand.
+        """
+        self.__virtual_address_controller = virtual_address_controller
         self.__counter = 1
         self.__count = {}
 
     def next(self, var_type: Type) -> TemporaryVariable:
-        new_temporary_variable = TemporaryVariable(self.__counter, var_type)
+        virtual_address = self.__virtual_address_controller.acquire(
+            Scope.TEMPORARY, var_type)
+        new_temporary_variable = TemporaryVariable(
+            self.__counter, var_type, virtual_address)
         self.__counter += 1
 
         if var_type.canonical() not in self.__count:
@@ -93,6 +126,9 @@ class Parser():
 
     def p_static_item(self, p):
         "static_item : STATIC IDENTIFIER static_item_check_id ':' type ';'"
+        virtual_address = self.__virtual_address_controller.acquire(
+            Scope.GLOBAL, p[5])
+        p[2].set_virtual_address(virtual_address)
         static_item = StaticItem(p[2], p[5])
         self.__dir_func.add_static_item(static_item)
         p[0] = static_item
@@ -114,6 +150,7 @@ class Parser():
         self.__temp_function_identifier = None
 
         p[0] = Function(p[2], p[5], p[7], p[9], p[11])
+        self.__virtual_address_controller.end_local_scope()
 
     def p_function_point_1(self, p):
         "function_point_1 : "
@@ -128,11 +165,23 @@ class Parser():
             self.__temp_function_identifier)
         self.__dir_func.set_function_start_quadruple_index(
             self.__temp_function_identifier, len(self.__quadruples))
+        self.__virtual_address_controller.start_local_scope()
 
     def p_function_point_2(self, p):
         "function_point_2 :"
-        self.__dir_func.add_function_return_type(
-            self.__temp_function_identifier, p[-1])
+        if p[-1] is None:
+            self.__dir_func.add_function_return_type(
+                self.__temp_function_identifier, p[-1])
+            return
+        virtual_address = self.__virtual_address_controller.acquire(
+            Scope.GLOBAL, Type(p[-1]))
+        self.__temp_function_identifier.set_virtual_address(
+            virtual_address)
+        function_entry = self.__dir_func.function_entry(
+            self.__temp_function_identifier)
+        function_entry.set_return_virtual_address(virtual_address)
+        self.__dir_func.set_function_entry(
+            self.__temp_function_identifier, function_entry)
 
     def p_function_point_3(self, p):
         'function_point_3 :'
@@ -160,6 +209,9 @@ class Parser():
 
     def p_function_param(self, p):
         "function_param : IDENTIFIER function_param_check_id ':' type"
+        virtual_address = self.__virtual_address_controller.acquire(
+            Scope.LOCAL, p[4])
+        p[1].set_virtual_address(virtual_address)
         function_parameter = FunctionParameter(p[1], p[4])
         self.__dir_func.add_function_parameter(
             self.__temp_function_identifier, function_parameter)
@@ -203,6 +255,9 @@ class Parser():
 
     def p_let_statament(self, p):
         "let_statement : LET IDENTIFIER let_statement_check_id ':' type ';'"
+        virtual_address = self.__virtual_address_controller.acquire(
+            Scope.LOCAL, p[5])
+        p[2].set_virtual_address(virtual_address)
         let_statement = LetStatement(p[2], p[5])
         self.__dir_func.add_function_let_statement(
             self.__temp_function_identifier, let_statement)
@@ -267,7 +322,9 @@ class Parser():
                               | INTEGER_LITERAL
                               | FLOAT_LITERAL
                               | BOOL_LITERAL"""
-
+        virtual_address = self.__virtual_address_controller.acquire(
+            Scope.CONSTANT, p[1].type())
+        p[1].set_virtual_address(virtual_address)
         p[0] = LiteralExpression(p[1])
 
     def p_literal_expression_error(self, p):
@@ -471,12 +528,14 @@ class Parser():
                            | IDENTIFIER call_expression_point_1 '(' call_params empty ')'
                            | IDENTIFIER call_expression_point_1 '(' empty empty ')'"""
 
-        if p[4] == None:
+        if p[4] is None:
             if not self.__dir_func.function_parameters_match(p[1], []):
                 print(
                     f"Function call parameters do not match function parameters definition {self.lexer.lexer.lineno}")
                 sys.exit(1)
-
+            function_entry = self.__dir_func.function_entry(p[1])
+            return_virtual_address = function_entry.return_virtual_address()
+            p[1].set_virtual_address(return_virtual_address)
             p[0] = CallExpression(p[1], [], self.__dir_func)
         else:
             call_params_types: list[Type] = list(
@@ -485,7 +544,9 @@ class Parser():
                 print(
                     f"Call parameter types do not match function parameter types in line {self.lexer.lexer.lineno}")
                 sys.exit(1)
-
+            function_entry = self.__dir_func.function_entry(p[1])
+            return_virtual_address = function_entry.return_virtual_address()
+            p[1].set_virtual_address(return_virtual_address)
             p[0] = CallExpression(p[1], p[4], self.__dir_func)
 
         self.__quadruples.append([
@@ -574,7 +635,6 @@ class Parser():
             None,
             self.__temp_function_identifier
         ])
-        # self.__quadruples += p[0].quadruples()
 
     def p_return_expression_empty(self, p):
         "return_expression : RETURN empty"
@@ -967,13 +1027,16 @@ class Parser():
         print(f"Illegal token {p} at line {self.lexer.lexer.lineno}")
         sys.exit(1)
 
-    def __init__(self, lexer, dir_func: DirFunc, semantic_cube: SemanticCube, quadruples, **kwargs):
+    def __init__(self, lexer, dir_func: DirFunc, semantic_cube: SemanticCube, quadruples, virtual_address_feature_on: bool = True, virtual_address_controller=None, **kwargs):
         self.lexer = lexer
         self.__dir_func = dir_func
         self.__semantic_cube = semantic_cube
         self.__temp_function_identifier = None
         self.__quadruples = quadruples
-        self.__temp_var_generator = TemporaryVariableGenerator()
+        self.__virtual_address_feature_on = virtual_address_feature_on
+        self.__virtual_address_controller = virtual_address_controller
+        self.__temp_var_generator = TemporaryVariableGenerator(
+            self.__virtual_address_controller)
         self.__infinite_loop_expression_start = []
         self.__predicate_loop_expression_start = []
         self.__predicate_loop_expression_goto_f = []

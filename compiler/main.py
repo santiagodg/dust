@@ -1,6 +1,8 @@
 import sys
 
-from compiler import Lexer, Parser, Compiler, DirFunc, SemanticCube, pretty_print_quadruples
+from compiler import Lexer, Parser, Compiler, DirFunc, SemanticCube, pretty_print_quadruples_with_addresses
+from compiler.virtual_address import VirtualAddressControllerConcrete, VirtualAddressConcrete
+
 
 def main():
 
@@ -8,7 +10,10 @@ def main():
     dir_func = DirFunc()
     semantic_cube = SemanticCube()
     quadruples = []
-    p = Parser(l, dir_func, semantic_cube, quadruples)
+    virtual_address_controller = VirtualAddressControllerConcrete(
+        VirtualAddressConcrete.LIMITS)
+    p = Parser(l, dir_func, semantic_cube, quadruples, virtual_address_feature_on=True,
+               virtual_address_controller=virtual_address_controller)
     c = Compiler(p, dir_func, semantic_cube)
 
     if len(sys.argv) != 2:
@@ -17,7 +22,7 @@ def main():
     {sys.argv[0]} -                 Reads from stdin the source code to compile.
     {' ' * len(sys.argv[0])}                   To end, enter Ctrl+Z.''')
         return
-    
+
     source_code = ''
     if sys.argv[1] == '-':
         source_code = sys.stdin.read()
@@ -33,7 +38,8 @@ def main():
     # print(dir_func)
 
     print()
-    pretty_print_quadruples(quadruples)
+    pretty_print_quadruples_with_addresses(quadruples)
+
 
 if __name__ == '__main__':
     main()

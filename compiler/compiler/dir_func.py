@@ -53,6 +53,7 @@ class FunctionEntry:
         let_statements: dict[str, LetStatement] = {},
         temporary_variables_count: dict[str, int] = {},
         start_quadruple_index: int = -1,
+        return_virtual_address=None,
     ):
 
         self.__identifier = identifier
@@ -61,6 +62,7 @@ class FunctionEntry:
         self.__let_statements = let_statements
         self.__temporary_variables_count = temporary_variables_count
         self.__start_quadruple_index = start_quadruple_index
+        self.__return_virtual_address = return_virtual_address
 
     def exists_identifier(self, variable_identifier: Identifier) -> bool:
         return variable_identifier.identifier() in self.__parameters.keys() ^ self.__let_statements.keys()
@@ -104,6 +106,12 @@ class FunctionEntry:
 
     def set_start_quadruple_index(self, index: int):
         self.__start_quadruple_index = index
+
+    def return_virtual_address(self):
+        return self.__return_virtual_address
+
+    def set_return_virtual_address(self, virtual_address):
+        self.__return_virtual_address = virtual_address
 
     def __repr__(self):
         return self.__str__()
@@ -174,7 +182,7 @@ class DirFunc:
     def exists_function(self, identifier: Identifier) -> bool:
         return identifier.identifier() in self.__functions.keys()
 
-    def get_typed_local_or_static_identifier(self, function_identifier: Identifier, identifier: Identifier) -> Optional[Type]:
+    def get_typed_local_or_static_identifier(self, function_identifier: Identifier, identifier: Identifier) -> Optional[Identifier]:
         """
         Returns a typed local or static identifier.
 
@@ -206,6 +214,9 @@ class DirFunc:
 
     def function_entry(self, function_identifier: Identifier) -> FunctionEntry:
         return self.__functions[function_identifier.identifier()]
+
+    def set_function_entry(self, function_identifier: Identifier, function_entry: FunctionEntry):
+        self.__functions[function_identifier.identifier()] = function_entry
 
     def add_temporary_variable_count(self, function_identifier: Identifier, count: dict[str, int]):
         if function_identifier.identifier() not in self.__functions:
