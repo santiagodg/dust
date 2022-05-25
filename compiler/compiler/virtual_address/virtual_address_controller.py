@@ -84,59 +84,6 @@ class VirtualAddressControllerInterface(ABC):
         """
 
 
-# class GenericScopeVirtualAddressSubcontroller:
-#     def __init__(self, class_name, virtual_address_class, base_address, max_size):
-#         self.__class_name = class_name
-#         self.__virtual_address_class = virtual_address_class
-#         self.__base_address = base_address
-#         self.__max_size = max_size
-#         self.__type_counter = _TypeCounter()
-
-#     def acquire(self, addr_type, size=1) -> VirtualAddress:
-#         subcontroller_address = self.__type_counter.value(addr_type)
-#         if subcontroller_address + size > self.__max_size:
-#             print(
-#                 f'Error: {self.class_name}.acquire(): ran out of addresses to release')
-#         if address + size > self.__max_size:
-#         self.__type_counter.increment(addr_type, size)
-#         return self.__virtual_address_class(address)
-
-
-# class GlobalVirtualAddressController:
-#     def __init__(self, max_size_per_type, base_address):
-#         self.__max_size_per_type = max_size_per_type
-#         self.__base_address = base_address
-#         self.__type_counter = _TypeCounter()
-
-#     def acquire(self, addr_type, size=1):
-#         type_address = self.__type_counter.value()
-#         if type_address + size > self.__max_size_per_type[addr_type]:
-#             print(
-#                 f'Error: GlobalVirtualAddressController.acquire(): ran out of {addr_type} addresses to release.')
-#             sys.exit(1)
-#         self.__type_counter.increment(addr_type, size)
-#         virtual_address_number = type_address + self.__base_address
-#         return VirtualAddressConcrete(virtual_address_number)
-
-
-# class _VirtualAddressSubcontrollerFactory:
-#     def create(self, scope):
-#         subcontroller = None
-#         if scope is Scope.GLOBAL:
-#             subcontroller = GlobalVirtualAddressController()
-#         elif scope is Scope.LOCAL:
-#             subcontroller = LocalVirtualAddressController()
-#         elif scope is Scope.TEMPORARY:
-#             subcontroller = TemporaryVirtualAddressController()
-#         elif scope is Scope.CONSTANT:
-#             subcontroller = ConstantVirtualAddressController()
-#         else:
-#             print(
-#                 f'Error: _VirtualAddressSubcontrollerFactory.create(): scope not supported: {scope}')
-#             sys.exit(1)
-#         return subcontroller
-
-
 class VirtualAddressControllerConcrete(VirtualAddressControllerInterface):
     """Implements VirtualAddressControllerInterface."""
 
