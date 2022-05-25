@@ -54,21 +54,27 @@ class FunctionEntry:
         temporary_variables_count: dict[str, int] = {},
         start_quadruple_index: int = -1,
         return_virtual_address=None,
+        local_variable_count: dict[str, int] = {},
     ):
 
         self.__identifier = identifier
-        self.__parameters = parameters
+        self.__parameters = copy.deepcopy(parameters)
         self.__return_type = return_type
         self.__let_statements = let_statements
         self.__temporary_variables_count = temporary_variables_count
         self.__start_quadruple_index = start_quadruple_index
         self.__return_virtual_address = return_virtual_address
+        self.__local_variable_count = copy.deepcopy(local_variable_count)
 
     def exists_identifier(self, variable_identifier: Identifier) -> bool:
         return variable_identifier.identifier() in self.__parameters.keys() ^ self.__let_statements.keys()
 
     def add_parameter(self, parameter: FunctionParameter):
-        self.__parameters[parameter.identifier().identifier()] = parameter
+        self.__parameters[parameter.identifier().identifier()
+                          ] = copy.deepcopy(parameter)
+
+    def parameters(self):
+        return copy.deepcopy(self.__parameters)
 
     def add_let_statement(self, let_statement: LetStatement):
         self.__let_statements[let_statement.identifier(
@@ -112,6 +118,46 @@ class FunctionEntry:
 
     def set_return_virtual_address(self, virtual_address):
         self.__return_virtual_address = virtual_address
+
+    def get_local_variable_count(self):
+        """Get local variable count.
+
+        Returns
+        -------
+        local_variable_count - Dict[str, int]
+            A dictionary containing the amount of local variables used
+            in a function for each primitive data type.
+
+            Example
+            -------
+            {
+                'bool': 3,
+                'char': 55,
+                'i32': 12,
+                'f64': 15,
+            }
+        """
+        return copy.deepcopy(self.__local_variable_count)
+
+    def set_local_variable_count(self, count):
+        """Set local variable count.
+
+        Parameters
+        ----------
+        count - Dict[str, int]
+            A dictionary containing the amount of local variables used
+            in a function for each primitive data type.
+
+            Example
+            -------
+            {
+                'bool': 3,
+                'char': 55,
+                'i32': 12,
+                'f64': 15,
+            }
+        """
+        self.__local_variable_count = copy.deepcopy(count)
 
     def __repr__(self):
         return self.__str__()
@@ -213,7 +259,7 @@ class DirFunc:
         return True
 
     def function_entry(self, function_identifier: Identifier) -> FunctionEntry:
-        return self.__functions[function_identifier.identifier()]
+        return copy.deepcopy(self.__functions[function_identifier.identifier()])
 
     def set_function_entry(self, function_identifier: Identifier, function_entry: FunctionEntry):
         self.__functions[function_identifier.identifier()] = function_entry
@@ -235,6 +281,46 @@ class DirFunc:
 
         self.__functions[function_identifier.identifier(
         )].set_start_quadruple_index(index)
+
+    def globals_table(self):
+        result = {
+            'bool': 0,
+            'char': 0,
+            'i32': 0,
+            'f64': 0,
+        }
+        for _static_item_name, static_item in self.__static_items.items():
+            size: int = 1
+            subtype = static_item.type()
+            while subtype.is_array():
+                array_type = subtype.type()
+                size *= array_type.length().value()
+                subtype = array_type.type()
+            primitive_type = subtype.type()
+            result[primitive_type.canonical()] += size
+        for _function_name, function_entry in self.__functions.items():
+            return_type = function_entry.return_type()
+            if return_type is None:
+                continue
+            result[return_type.canonical()] += 1
+        return result
+
+    def to_dict(self):
+        result = {}
+        for function_name, function_entry in self.__functions.items():
+            result[function_name] = {}
+            result[function_name]['parameters'] = []
+            for _parameter_name, parameter in function_entry.parameters().items():
+                result[function_name]['parameters'].append(
+                    parameter.identifier().operand().addr())
+            return_virtual_address = function_entry.return_virtual_address()
+            if return_virtual_address is None:
+                result[function_name]['return_address'] = None
+            else:
+                result[function_name]['return_address'] = return_virtual_address.addr()
+            result[function_name]['local_memory'] = function_entry.get_local_variable_count()
+            result[function_name]['temporary_memory'] = function_entry.get_temporary_variable_count()
+        return result
 
     def __repr__(self):
         return self.__str__()

@@ -142,6 +142,3 @@ class VirtualAddressConcrete(VirtualAddress):
 
     def type(self) -> PrimitiveType:
         return self.__addr_type
-
-    def __repr__(self):
-        return str(self.__addr)

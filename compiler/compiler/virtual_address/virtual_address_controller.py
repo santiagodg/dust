@@ -12,6 +12,8 @@ VirtualAddressControllerConcrete : implements VirtualAddressController
 from abc import ABC, abstractmethod
 import sys
 
+from ..dust_ast import PrimitiveType
+
 from .virtual_address import VirtualAddress, VirtualAddressConcrete
 from ._scope_type_counter import _ScopeTypeCounter
 from .scope import Scope
@@ -29,6 +31,24 @@ class VirtualAddressControllerInterface(ABC):
         Panics
         ------
         If this method is called twice without ending the local scope in between.
+
+    get_local_scope_counter(self):
+        Return local scope counter.
+
+        Returns
+        -------
+        local_scope_counter : Dict[str, int]
+            A dictionary containing the amount of local variables used
+            in a function for each data type.
+
+            Example
+            -------
+            {
+                'bool': 3,
+                'char': 55,
+                'i32': 12,
+                'f64': 15,
+            }
 
     end_local_scope(self):
         End the current local scope.
@@ -59,6 +79,26 @@ class VirtualAddressControllerInterface(ABC):
         Panics
         ------
         If this method is called twice without ending the local scope in between.
+        """
+
+    @abstractmethod
+    def get_local_scope_counter(self):
+        """Return local scope counter.
+
+        Returns
+        -------
+        local_scope_counter : Dict[str, int]
+            A dictionary containing the amount of local variables used
+            in a function for each data type.
+
+            Example
+            -------
+            {
+                'bool': 3,
+                'char': 55,
+                'i32': 12,
+                'f64': 15,
+            }
         """
 
     @abstractmethod
@@ -112,6 +152,32 @@ class VirtualAddressControllerConcrete(VirtualAddressControllerInterface):
         self.__state.start()
         self.__counter.clear_scope(Scope.LOCAL)
         self.__counter.clear_scope(Scope.TEMPORARY)
+
+    def get_local_scope_counter(self):
+        """Return local scope counter.
+
+        Returns
+        -------
+        local_scope_counter : Dict[str, int]
+            A dictionary containing the amount of local variables used
+            in a function for each primitive data type.
+
+            Example
+            -------
+            {
+                'bool': 3,
+                'char': 55,
+                'i32': 12,
+                'f64': 15,
+            }
+        """
+        result = {}
+        for primitive_type in ['bool', 'char', 'i32', 'f64']:
+            result[primitive_type] = self.__counter.value(
+                Scope.LOCAL,
+                PrimitiveType(primitive_type),
+            )
+        return result
 
     def end_local_scope(self):
         """End the current local scope.

@@ -75,14 +75,19 @@ class TemporaryVariableGenerator:
         self.__counter += 1
 
         if var_type.canonical() not in self.__count:
-            self.__count[var_type.canonical()] = 0
+            self.__count[var_type.canonical()] = 1
         else:
             self.__count[var_type.canonical()] += 1
 
         return new_temporary_variable
 
     def start_counting(self):
-        self.__count = {}
+        self.__count = {
+            'bool': 0,
+            'char': 0,
+            'i32': 0,
+            'f64': 0,
+        }
 
     def get_count(self) -> dict[str, int]:
         return copy.deepcopy(self.__count)
@@ -147,6 +152,13 @@ class Parser():
         self.__dir_func.add_temporary_variable_count(
             self.__temp_function_identifier, temporary_variables_count)
 
+        local_variable_count = self.__virtual_address_controller.get_local_scope_counter()
+        function_entry = self.__dir_func.function_entry(
+            self.__temp_function_identifier)
+        function_entry.set_local_variable_count(local_variable_count)
+        self.__dir_func.set_function_entry(
+            self.__temp_function_identifier, function_entry)
+
         self.__temp_function_identifier = None
 
         p[0] = Function(p[2], p[5], p[7], p[9], p[11])
@@ -179,6 +191,7 @@ class Parser():
             virtual_address)
         function_entry = self.__dir_func.function_entry(
             self.__temp_function_identifier)
+        function_entry.set_return_type(p[-1])
         function_entry.set_return_virtual_address(virtual_address)
         self.__dir_func.set_function_entry(
             self.__temp_function_identifier, function_entry)
@@ -325,6 +338,7 @@ class Parser():
         virtual_address = self.__virtual_address_controller.acquire(
             Scope.CONSTANT, p[1].type())
         p[1].set_virtual_address(virtual_address)
+        self.__constant_table[virtual_address.addr()] = p[1].value()
         p[0] = LiteralExpression(p[1])
 
     def p_literal_expression_error(self, p):
@@ -1027,7 +1041,7 @@ class Parser():
         print(f"Illegal token {p} at line {self.lexer.lexer.lineno}")
         sys.exit(1)
 
-    def __init__(self, lexer, dir_func: DirFunc, semantic_cube: SemanticCube, quadruples, virtual_address_feature_on: bool = True, virtual_address_controller=None, **kwargs):
+    def __init__(self, lexer, dir_func: DirFunc, semantic_cube: SemanticCube, quadruples, virtual_address_feature_on: bool = True, virtual_address_controller=None, constant_table={}, **kwargs):
         self.lexer = lexer
         self.__dir_func = dir_func
         self.__semantic_cube = semantic_cube
@@ -1042,6 +1056,7 @@ class Parser():
         self.__predicate_loop_expression_goto_f = []
         self.__if_expression_goto_f = []
         self.__if_expression_goto_t = []
+        self.__constant_table = constant_table
         self.parser = yacc.yacc(module=self, **kwargs)
 
     def restart(self):
