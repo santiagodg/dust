@@ -1042,7 +1042,6 @@ class Parser():
         self.__predicate_loop_expression_goto_f = []
         self.__if_expression_goto_f = []
         self.__if_expression_goto_t = []
-        self.__function_start_temporary_variable_count = None
         self.parser = yacc.yacc(module=self, **kwargs)
 
     def restart(self):
