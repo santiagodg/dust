@@ -3,6 +3,8 @@ from typing import Optional
 from .dust_type import Type
 from .index_expression import IndexExpression
 from .identifier import Identifier
+from .primitive_type import PrimitiveType
+
 
 class ReadExpression:
     def __init__(self, variable: Identifier | IndexExpression):
@@ -18,10 +20,10 @@ class ReadExpression:
         result += f'{space_padding}{space_indent}variable: {variable_str}'
 
         return result
-    
+
     def type(self) -> Optional[Type]:
         return None
-    
+
     def operand(self):
         """
         :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
@@ -35,15 +37,15 @@ class ReadExpression:
         """
 
         return [[
-            f'{type(self).__name__} unimplemented', 
+            f'{type(self).__name__} unimplemented',
             None,
             None,
-            None,
+            self.__variable.operand(),
         ]]
 
-    def __eq__(self, other) : 
+    def __eq__(self, other):
         return self.__dict__ == other.__dict__
-    
+
     def __repr__(self):
         return self.__str__()
 

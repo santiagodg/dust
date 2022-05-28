@@ -163,6 +163,12 @@ class Parser():
 
         p[0] = Function(p[2], p[5], p[7], p[9], p[11])
         self.__virtual_address_controller.end_local_scope()
+        self.__quadruples.append([
+            'Endfunc',
+            None,
+            None,
+            None,
+        ])
 
     def p_function_point_1(self, p):
         "function_point_1 : "
@@ -644,7 +650,7 @@ class Parser():
         p[0] = ReturnExpression(p[2])
 
         self.__quadruples.append([
-            '=',
+            'Return',
             p[2].operand(),
             None,
             self.__temp_function_identifier

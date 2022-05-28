@@ -1,7 +1,6 @@
 """Defines ObjFile interface and concrete classes."""
 
 import json
-from msilib.schema import File
 
 
 class ObjFile():
@@ -204,6 +203,7 @@ class ObjFile():
                         'i32': 1,
                         'f64': 0,
                     },
+                    'start_quadruple': 1,
                 }
                 'main': {
                     'parameters': [],
@@ -219,6 +219,7 @@ class ObjFile():
                         'i32': 0,
                         'f64': 0,
                     },
+                    'start_quadruple': 5,
                 }
             }
         """
@@ -288,7 +289,7 @@ class ObjFile():
         obj['globals_table'] = self.globals_table()
         obj['function_directory'] = self.function_directory()
         obj['quadruples'] = self.quadruples()
-        dumped = json.dumps(obj)
+        dumped = json.dumps(obj, indent=2)
         file = None
         try:
             file = open(self.output(), mode='x', encoding='utf-8')

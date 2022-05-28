@@ -320,6 +320,7 @@ class DirFunc:
                 result[function_name]['return_address'] = return_virtual_address.addr()
             result[function_name]['local_memory'] = function_entry.get_local_variable_count()
             result[function_name]['temporary_memory'] = function_entry.get_temporary_variable_count()
+            result[function_name]['start_quadruple'] = function_entry.get_start_quadruple_index()
         return result
 
     def __repr__(self):

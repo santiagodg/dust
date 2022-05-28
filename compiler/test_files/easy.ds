@@ -1,0 +1,16 @@
+fn main() {
+    write('H');
+    write('e');
+    write('l');
+    write('l');
+    write('o');
+    write(',');
+    write(' ');
+    write('w');
+    write('o');
+    write('r');
+    write('l');
+    write('d');
+    write('!');
+    write('\n');
+}

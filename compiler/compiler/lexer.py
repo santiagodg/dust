@@ -2,6 +2,7 @@ from .ply import lex
 
 from .dust_ast import Identifier, CharLiteral, IntegerLiteral, FloatLiteral, BooleanLiteral
 
+
 class Lexer:
     special_function_names = {
         'read': 'READ',
@@ -56,19 +57,19 @@ class Lexer:
     ] + list(reserved.values())
 
     literals = [',', ')', '(', ':', ';', ']', '[', '}',
-        '{', '=', '-', '!', '+', '*', '/', '%', '>', '<',
-    ]
+                '{', '=', '-', '!', '+', '*', '/', '%', '>', '<',
+                ]
 
     def t_CHAR_LITERAL(self, t):
-        r"'[^'\\\n\t\r]'"
-        t.value = CharLiteral(t.value)
+        r"'([^'\\]|\\.)'"
+        t.value = CharLiteral(t.value[1:-1])
         return t
 
     def t_FLOAT_LITERAL(self, t):
         r'[0-9][0-9]*\.[0-9][0-9]*'
         t.value = FloatLiteral(float(t.value))
         return t
-    
+
     def t_INTEGER_LITERAL(self, t):
         r'[0-9][0-9]*'
         t.value = IntegerLiteral(int(t.value))
@@ -81,9 +82,9 @@ class Lexer:
             t.value = BooleanLiteral(True)
         else:
             t.value = BooleanLiteral(False)
-        
+
         return t
-    
+
     def t_IDENTIFIER(self, t):
         r'[a-zA-Z_][a-zA-Z_0-9]*'
         t.type = self.reserved.get(t.value, 'IDENTIFIER')
@@ -104,7 +105,7 @@ class Lexer:
     def t_newline(self, t):
         r'\n+'
         t.lexer.lineno += len(t.value)
-    
+
     t_ignore = " \t"
 
     def t_error(self, t):
@@ -114,7 +115,7 @@ class Lexer:
 
     def __init__(self, **kwargs):
         self.lexer = lex.lex(module=self, **kwargs)
-    
+
     def test(self, data):
         self.lexer.input(data)
 

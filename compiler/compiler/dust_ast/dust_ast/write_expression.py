@@ -2,6 +2,7 @@ from typing import Optional
 
 from .dust_type import Type
 
+
 class WriteExpression:
     def __init__(self, expression):
         "expression: Expression"
@@ -12,35 +13,36 @@ class WriteExpression:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'WriteExpression:\n'
-        expression_str: str = self.__expression.to_string(indent, padding + indent)
+        expression_str: str = self.__expression.to_string(
+            indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
-    
+
     def type(self) -> Optional[Type]:
         return None
-    
+
     def operand(self):
         """
         :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
         """
 
         return None
-    
+
     def quadruples(self):
         """
         :rtype: List[Tuple[str, str, str, str]]
         """
 
         return [[
-            f'{type(self).__name__} unimplemented', 
+            f'write',
             None,
             None,
-            None,
+            self.__expression.operand(),
         ]]
 
-    def __eq__(self, other) : 
+    def __eq__(self, other):
         return self.__dict__ == other.__dict__
-    
+
     def __repr__(self):
         return self.__str__()
 
