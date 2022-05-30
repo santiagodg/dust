@@ -12,14 +12,14 @@ from .virtual_address import Scope
 
 
 class TemporaryVariable:
-    def __init__(self, number: int, var_type: Type, virtual_address):
+    def __init__(self, number: int, var_type, virtual_address):
         """Construct a TemporaryVariable object.
 
         Parameters
         ----------
         number : int
             The unique number to identifiy this temporary variable.
-        var_type : Type
+        var_type : Type | 'pointer'
             The type of this variable.
         virtual_address : VirtualAddress
             This temporary variable's virtual address."""
@@ -68,16 +68,26 @@ class TemporaryVariableGenerator:
         self.__count = {}
 
     def next(self, var_type: Type) -> TemporaryVariable:
+        """Release next temporary variable.
+
+        Parameters
+        ----------
+        var_type - Type | 'pointer'
+            Variable type.
+        """
         virtual_address = self.__virtual_address_controller.acquire(
             Scope.TEMPORARY, var_type)
         new_temporary_variable = TemporaryVariable(
             self.__counter, var_type, virtual_address)
         self.__counter += 1
 
-        if var_type.canonical() not in self.__count:
-            self.__count[var_type.canonical()] = 1
+        key = var_type
+        if var_type != 'pointer':
+            key = var_type.canonical()
+        if key not in self.__count:
+            self.__count[key] = 1
         else:
-            self.__count[var_type.canonical()] += 1
+            self.__count[key] += 1
 
         return new_temporary_variable
 
@@ -341,10 +351,17 @@ class Parser():
                               | INTEGER_LITERAL
                               | FLOAT_LITERAL
                               | BOOL_LITERAL"""
-        virtual_address = self.__virtual_address_controller.acquire(
-            Scope.CONSTANT, p[1].type())
-        p[1].set_virtual_address(virtual_address)
-        self.__constant_table[virtual_address.addr()] = p[1].value()
+        constant_literal_virtual_address = None
+        for virtual_address, value in self.__constant_table.items():
+            if value == p[1].value():
+                constant_literal_virtual_address = virtual_address
+                break
+        if constant_literal_virtual_address is None:
+            constant_literal_virtual_address = self.__virtual_address_controller.acquire(
+                Scope.CONSTANT, p[1].type()).addr()
+            self.__constant_table[constant_literal_virtual_address] = p[1].value(
+            )
+        p[1].set_virtual_address(constant_literal_virtual_address)
         p[0] = LiteralExpression(p[1])
 
     def p_literal_expression_error(self, p):
@@ -528,20 +545,138 @@ class Parser():
         p[0] = result
 
     def p_index_expression(self, p):
-        "index_expression : expression '[' INTEGER_LITERAL ']'"
-
-        if not p[1].type().is_array():
+        "index_expression : IDENTIFIER index_expression_point_1 index_parameters"
+        typed_identifier = self.__dir_func.get_typed_local_or_static_identifier(
+            self.__temp_function_identifier, p[1])
+        if self.__array_dimension_stack[-1] - 1 != len(typed_identifier.type().type().shape()):
             print(
-                f"Cannot perform indexing for expression of type {p[1].type().canonical()} in line {self.lexer.lexer.lineno}")
+                f'Failed to access array: found indexing with {self.__array_dimension_stack[-1] - 1} parameters when {len(typed_identifier.type().type().shape())} where expected.')
             sys.exit(1)
+        constant_0_virtual_address = None
+        for virtual_address, value in self.__constant_table.items():
+            if value == 0:
+                constant_0_virtual_address = virtual_address
+                break
+        if constant_0_virtual_address is None:
+            constant_0_virtual_address = self.__virtual_address_controller.acquire(
+                Scope.CONSTANT, Type(PrimitiveType('i32'))).addr()
+            self.__constant_table[constant_0_virtual_address] = 0
+        temp = self.__temp_var_generator.next(Type(PrimitiveType('i32')))
+        self.__quadruples += [
+            [
+                '+',
+                self.__array_temporaries.pop(),
+                constant_0_virtual_address,
+                temp,
+            ],
+        ]
+        addr_value = typed_identifier.operand().addr()
+        constant_addr_value_virtual_address = None
+        for virtual_address, value in self.__constant_table.items():
+            if value == addr_value:
+                constant_addr_value_virtual_address = virtual_address
+                break
+        if constant_addr_value_virtual_address is None:
+            constant_addr_value_virtual_address = self.__virtual_address_controller.acquire(
+                Scope.CONSTANT, Type(PrimitiveType('i32'))).addr()
+            self.__constant_table[constant_addr_value_virtual_address] = addr_value
+        pointer = self.__temp_var_generator.next('pointer')
+        self.__quadruples += [
+            [
+                '+',
+                temp,
+                constant_addr_value_virtual_address,
+                pointer,
+            ]
+        ]
+        p[0] = IndexExpression(typed_identifier, p[3], pointer)
+        self.__array_current_identifier.pop()
+        self.__array_dimension_stack.pop()
 
-        if p[3].value() < 0 or p[1].type().type().length() >= p[3].value():
+    def p_index_expression_point_1(self, p):
+        "index_expression_point_1 :"
+        typed_identifier = self.__dir_func.get_typed_local_or_static_identifier(
+            self.__temp_function_identifier, p[-1])
+        if not typed_identifier.type().is_array():
             print(
-                f"Index '{p[3].value()}' out of range for array of length {p[1].type().type().length()} in line {self.lexer.lexer.lineno}")
+                f"Cannot perform indexing for identifier '{p[-1].identifier()}' of type {p[-1].type().canonical()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
+        self.__array_dimension_stack.append(1)
+        self.__array_current_identifier.append(typed_identifier)
 
-        p[0] = IndexExpression(p[1], p[3], self.__temp_var_generator)
-        self.__quadruples += p[0].quadruples()
+    def p_index_parameters(self, p):
+        """index_parameters : index_parameters '[' expression ']'
+                            | empty"""
+        if len(p) == 2:
+            p[0] = []
+            return
+        if p[3].type().canonical() != 'i32':
+            print(
+                f'Indexing an array with an expression of type {p[3].canonical()} is not allowed. Index parameter must be i32.')
+            sys.exit(1)
+        constant_0_virtual_address = None
+        for virtual_address, value in self.__constant_table.items():
+            if value == 0:
+                constant_0_virtual_address = virtual_address
+                break
+        if constant_0_virtual_address is None:
+            constant_0_virtual_address = self.__virtual_address_controller.acquire(
+                Scope.CONSTANT, Type(PrimitiveType('i32'))).addr()
+            self.__constant_table[constant_0_virtual_address] = 0
+        constant_upper_limit_virtual_address = None
+        for virtual_address, value in self.__constant_table.items():
+            if value == self.__array_current_identifier[-1].type().type().shape()[
+                    self.__array_dimension_stack[-1] - 1]:
+                constant_upper_limit_virtual_address = virtual_address
+                break
+        if constant_upper_limit_virtual_address is None:
+            constant_upper_limit_virtual_address = self.__virtual_address_controller.acquire(
+                Scope.CONSTANT, Type(PrimitiveType('i32'))).addr()
+            self.__constant_table[constant_upper_limit_virtual_address] = self.__array_current_identifier[-1].type().type().shape()[
+                self.__array_dimension_stack[-1] - 1]
+        self.__quadruples.append(
+            [
+                'Verify',
+                p[3].operand(),
+                constant_0_virtual_address,
+                constant_upper_limit_virtual_address,
+            ],
+        )
+        if self.__array_dimension_stack[-1] < len(self.__array_current_identifier[-1].type().type().shape()):
+            aux = p[3]
+            m = self.__array_current_identifier[-1].type().type().accumulated_magnitudes()[
+                self.__array_dimension_stack[-1]]
+            constant_upper_limit_virtual_address = None
+            for virtual_address, value in self.__constant_table.items():
+                if value == m:
+                    constant_upper_limit_virtual_address = virtual_address
+                    break
+            if constant_upper_limit_virtual_address is None:
+                constant_upper_limit_virtual_address = self.__virtual_address_controller.acquire(
+                    Scope.CONSTANT, Type(PrimitiveType('i32'))).addr()
+                self.__constant_table[constant_upper_limit_virtual_address] = m
+            self.__array_temporaries.append(
+                self.__temp_var_generator.next(Type(PrimitiveType('i32'))))
+            self.__quadruples.append([
+                '*',
+                aux.operand(),
+                constant_upper_limit_virtual_address,
+                copy.deepcopy(self.__array_temporaries[-1]),
+            ])
+        if self.__array_dimension_stack[-1] > 1:
+            aux1 = self.__array_temporaries.pop()
+            aux2 = p[3].operand()
+            self.__array_temporaries.append(
+                self.__temp_var_generator.next(Type(PrimitiveType('i32'))))
+            self.__quadruples.append([
+                '+',
+                aux1,
+                aux2,
+                copy.deepcopy(self.__array_temporaries[-1]),
+            ])
+        self.__array_dimension_stack[-1] += 1
+        p[1].append(p[3])
+        p[0] = p[1]
 
     def p_call_expression(self, p):
         """call_expression : IDENTIFIER call_expression_point_1 '(' call_params ',' ')'
@@ -1063,6 +1198,9 @@ class Parser():
         self.__if_expression_goto_f = []
         self.__if_expression_goto_t = []
         self.__constant_table = constant_table
+        self.__array_dimension_stack = []
+        self.__array_current_identifier = []
+        self.__array_temporaries = []
         self.parser = yacc.yacc(module=self, **kwargs)
 
     def restart(self):

@@ -6,10 +6,10 @@ from .dust_type import Type
 
 
 class IntegerLiteral:
-    def __init__(self, integer: int):
+    def __init__(self, integer: int, virtual_address):
         self.__integer: int = integer
         self.__type: Type = Type(PrimitiveType('i32'))
-        self.__virtual_address = None
+        self.__virtual_address = virtual_address
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

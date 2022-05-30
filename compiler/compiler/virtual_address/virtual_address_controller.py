@@ -194,6 +194,14 @@ class VirtualAddressControllerConcrete(VirtualAddressControllerInterface):
 
     def acquire(self, scope, addr_type) -> VirtualAddress:
         size: int = 1
+        if addr_type == 'pointer':
+            offset = self.__counter.value(scope, addr_type)
+            if offset + 1 > self.__limits[scope]['types']['pointer']['max_amount']:
+                print(
+                    f'Error: VirtualAddressControllerConcrete.acquire(): ran out of addresses to release for scope {scope} and type {addr_type}.')
+                sys.exit(1)
+            self.__counter.increment(scope, addr_type, size)
+            return VirtualAddressConcrete(scope, addr_type, offset)
         subtype = addr_type
         while subtype.is_array():
             array_type = subtype.type()

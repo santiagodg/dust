@@ -22,6 +22,7 @@ def quadruples_to_dict(quadruples):
                 subresult.append(quadruple[i].operand().addr())
                 continue
             if isinstance(quadruple[i], (BooleanLiteral, IntegerLiteral, FloatLiteral, CharLiteral)):
+                print(quadruple)
                 subresult.append(quadruple[i].operand().addr())
                 continue
             if isinstance(quadruple[i], VirtualAddressConcrete):
@@ -33,13 +34,15 @@ def quadruples_to_dict(quadruples):
 
 
 def main():
-    l = Lexer()
+
     dir_func = DirFunc()
     semantic_cube = SemanticCube()
     quadruples = []
     virtual_address_controller = VirtualAddressControllerConcrete(
         VirtualAddressConcrete.LIMITS)
     constant_table = {}
+    l = Lexer(constant_table=constant_table,
+              virtual_address_controller=virtual_address_controller)
     p = Parser(l, dir_func, semantic_cube, quadruples, virtual_address_feature_on=True,
                virtual_address_controller=virtual_address_controller, constant_table=constant_table)
     c = Compiler(p, dir_func, semantic_cube)

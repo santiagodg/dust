@@ -6,10 +6,10 @@ from .dust_type import Type
 
 
 class BooleanLiteral:
-    def __init__(self, boolean: bool):
+    def __init__(self, boolean: bool, virtual_address):
         self.__boolean: boolean = boolean
         self.__type: Type = Type(PrimitiveType('bool'))
-        self.__virtual_address = None
+        self.__virtual_address = virtual_address
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

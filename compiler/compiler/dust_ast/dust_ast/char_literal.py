@@ -6,10 +6,10 @@ from .dust_type import Type
 
 
 class CharLiteral:
-    def __init__(self, char: str):
+    def __init__(self, char: str, virtual_address):
         self.__char: str = char
         self.__type = Type(PrimitiveType('char'))
-        self.__virtual_address = None
+        self.__virtual_address = virtual_address
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''

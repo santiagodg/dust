@@ -11,7 +11,7 @@ class _ScopeTypeCounter:
         self.__counter = {}
         for scope in list(Scope):
             self.__counter[scope] = {}
-            for primitive_type in ['bool', 'char', 'i32', 'f64']:
+            for primitive_type in ['bool', 'char', 'i32', 'f64', 'pointer']:
                 self.__counter[scope][primitive_type] = 0
 
     def increment(self, scope, addr_type, amount):
@@ -21,11 +21,14 @@ class _ScopeTypeCounter:
         ----------
         scope : Scope
             The scope of the counter.
-        addr_type : PrimitiveType
+        addr_type : PrimitiveType | 'pointer'
             The type of the counter.
         amount : int
             Amount of addresses released.
         """
+        if addr_type == 'pointer':
+            self.__counter[scope]['pointer'] += amount
+            return
         self.__counter[scope][addr_type.canonical()] += amount
 
     def value(self, scope, addr_type):
@@ -35,7 +38,7 @@ class _ScopeTypeCounter:
         ----------
         scope : Scope
             The scope of the counter.
-        addr_type : PrimitiveType
+        addr_type : PrimitiveType | 'pointer'
             The type of the counter.
 
         Returns
@@ -43,6 +46,8 @@ class _ScopeTypeCounter:
         value : int
             The current value of the specified counter.
         """
+        if addr_type == 'pointer':
+            return self.__counter[scope]['pointer']
         return self.__counter[scope][addr_type.canonical()]
 
     def clear_scope(self, scope):
@@ -54,5 +59,5 @@ class _ScopeTypeCounter:
             Scope of the counter to clear.
         """
         self.__counter[scope] = {}
-        for primitive_type in ['bool', 'char', 'i32', 'f64']:
+        for primitive_type in ['bool', 'char', 'i32', 'f64', 'pointer']:
             self.__counter[scope][primitive_type] = 0

@@ -1,6 +1,7 @@
 from .ply import lex
 
-from .dust_ast import Identifier, CharLiteral, IntegerLiteral, FloatLiteral, BooleanLiteral
+from .dust_ast import Identifier, CharLiteral, IntegerLiteral, FloatLiteral, BooleanLiteral, Type, PrimitiveType
+from .virtual_address import Scope
 
 
 class Lexer:
@@ -62,27 +63,65 @@ class Lexer:
 
     def t_CHAR_LITERAL(self, t):
         r"'([^'\\]|\\.)'"
-        t.value = CharLiteral(t.value[1:-1])
+        constant_literal_virtual_address = None
+        for virtual_address, value in self.__constant_table.items():
+            if value == t.value[1:-1]:
+                constant_literal_virtual_address = virtual_address
+                break
+        if constant_literal_virtual_address is None:
+            constant_literal_virtual_address = self.__virtual_address_controller.acquire(
+                Scope.CONSTANT, Type(PrimitiveType('char')))
+            self.__constant_table[constant_literal_virtual_address.addr(
+            )] = t.value[1:-1]
+        t.value = CharLiteral(t.value[1:-1], constant_literal_virtual_address)
         return t
 
     def t_FLOAT_LITERAL(self, t):
         r'[0-9][0-9]*\.[0-9][0-9]*'
-        t.value = FloatLiteral(float(t.value))
+        constant_literal_virtual_address = None
+        for virtual_address, value in self.__constant_table.items():
+            if value == float(t.value):
+                constant_literal_virtual_address = virtual_address
+                break
+        if constant_literal_virtual_address is None:
+            constant_literal_virtual_address = self.__virtual_address_controller.acquire(
+                Scope.CONSTANT, Type(PrimitiveType('f64')))
+            self.__constant_table[constant_literal_virtual_address.addr()] = float(
+                t.value)
+        t.value = FloatLiteral(
+            float(t.value), constant_literal_virtual_address)
         return t
 
     def t_INTEGER_LITERAL(self, t):
         r'[0-9][0-9]*'
-        t.value = IntegerLiteral(int(t.value))
+        constant_literal_virtual_address = None
+        for virtual_address, value in self.__constant_table.items():
+            if value == int(t.value):
+                constant_literal_virtual_address = virtual_address
+                break
+        if constant_literal_virtual_address is None:
+            constant_literal_virtual_address = self.__virtual_address_controller.acquire(
+                Scope.CONSTANT, Type(PrimitiveType('i32')))
+            self.__constant_table[constant_literal_virtual_address.addr()] = int(
+                t.value)
+        t.value = IntegerLiteral(
+            int(t.value), constant_literal_virtual_address)
         return t
 
     def t_BOOL_LITERAL(self, t):
         r'(true|false)'
-
-        if t.value == 'true':
-            t.value = BooleanLiteral(True)
-        else:
-            t.value = BooleanLiteral(False)
-
+        t.value = t.value == 'true'
+        constant_literal_virtual_address = None
+        for virtual_address, value in self.__constant_table.items():
+            if value == t.value:
+                constant_literal_virtual_address = virtual_address
+                break
+        if constant_literal_virtual_address is None:
+            constant_literal_virtual_address = self.__virtual_address_controller.acquire(
+                Scope.CONSTANT, Type(PrimitiveType('bool')))
+            self.__constant_table[constant_literal_virtual_address.addr(
+            )] = t.value
+        t.value = BooleanLiteral(t.value, constant_literal_virtual_address)
         return t
 
     def t_IDENTIFIER(self, t):
@@ -113,7 +152,9 @@ class Lexer:
         print(t)
         t.lexer.skip(1)
 
-    def __init__(self, **kwargs):
+    def __init__(self, constant_table={}, virtual_address_controller=None, **kwargs):
+        self.__constant_table = constant_table
+        self.__virtual_address_controller = virtual_address_controller
         self.lexer = lex.lex(module=self, **kwargs)
 
     def test(self, data):

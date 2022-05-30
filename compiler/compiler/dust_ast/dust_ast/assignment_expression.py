@@ -2,13 +2,14 @@ from typing import Optional
 
 from .dust_type import Type
 
+
 class AssignmentExpression:
     def __init__(self, left_expression, right_expression):
         """
         left_expression: Expression
         right_expression: Expression
         """
-        
+
         self.__left_expression = left_expression
         self.__right_expression = right_expression
 
@@ -17,12 +18,14 @@ class AssignmentExpression:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'AssignmentExpression:\n'
-        left_expression_str: str = self.__left_expression.to_string(indent, padding + indent)
+        left_expression_str: str = self.__left_expression.to_string(
+            indent, padding + indent)
         result += f'{space_padding}{space_indent}left_expression: {left_expression_str}\n'
-        right_expression_str: str = self.__right_expression.to_string(indent, padding + indent)
+        right_expression_str: str = self.__right_expression.to_string(
+            indent, padding + indent)
         result += f'{space_padding}{space_indent}right_expression: {right_expression_str}'
         return result
-    
+
     def type(self) -> Optional[Type]:
         return None
 
@@ -30,20 +33,20 @@ class AssignmentExpression:
         """
         :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
         """
-        
+
         left_expression_temporary_variable = self.__left_expression.operand()
         right_expression_temporary_variable = self.__right_expression.operand()
 
         return [[
-            '=', 
-            right_expression_temporary_variable, 
+            '=',
+            right_expression_temporary_variable,
             None,
             left_expression_temporary_variable
         ]]
 
-    def __eq__(self, other) : 
+    def __eq__(self, other):
         return self.__dict__ == other.__dict__
-    
+
     def __repr__(self):
         return self.__str__()
 

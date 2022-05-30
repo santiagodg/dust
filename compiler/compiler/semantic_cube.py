@@ -1,8 +1,7 @@
 from typing import Optional
 
-from numpy import equal, greater
-
 from .dust_ast import PrimitiveType
+
 
 class SemanticCube:
     def __init__(self):

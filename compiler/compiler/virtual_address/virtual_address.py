@@ -90,6 +90,10 @@ class VirtualAddressConcrete(VirtualAddress):
                     "base": 3000,
                     "max_amount": 1000,
                 },
+                "pointer": {
+                    "base": 4000,
+                    "max_amount": 1000,
+                }
             },
         },
         Scope.CONSTANT: {
@@ -115,21 +119,26 @@ class VirtualAddressConcrete(VirtualAddress):
         },
     }
 
-    def __init__(self, scope, type, offset):
+    def __init__(self, scope, addr_type, offset):
         """Construct a virtual address.
 
         Parameters
         ----------
         scope: Scope
             The scope of this virtual address.
-        type: PrimitiveType
+        addr_type: PrimitiveType | 'pointer'
             The type of the virtual address.
         offset: int
             The offset of this virtual address from the base memory address of its section.
         """
         self.__scope = scope
-        self.__addr_type = type
+        self.__addr_type = addr_type
         self.__offset = offset
+        if addr_type == 'pointer':
+            self.__addr: int = self.LIMITS[self.__scope]['base'] + \
+                self.LIMITS[self.__scope]['types']['pointer']['base'] + \
+                self.__offset
+            return
         self.__addr: int = self.LIMITS[self.__scope]['base'] + \
             self.LIMITS[self.__scope]['types'][self.__addr_type.canonical(
             )]['base'] + self.__offset

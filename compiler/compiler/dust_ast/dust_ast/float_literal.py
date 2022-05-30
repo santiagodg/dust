@@ -5,10 +5,10 @@ from .dust_type import Type
 
 
 class FloatLiteral:
-    def __init__(self, f: float):
+    def __init__(self, f: float, virtual_address):
         self.__float: float = f
         self.__type: Type = Type(PrimitiveType('f64'))
-        self.__virtual_address = None
+        self.__virtual_address = virtual_address
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
