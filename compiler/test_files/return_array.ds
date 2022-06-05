@@ -1,0 +1,23 @@
+fn return_hello() -> [char; 5]
+let arr: [char; 5];
+{
+    arr[0] = 'h';
+    arr[1] = 'e';
+    arr[2] = 'l';
+    arr[3] = 'l';
+    arr[4] = 'o';
+    return arr;
+}
+
+fn write_array(arr: [char; 5]) {
+    write(arr[0]);
+    write(arr[1]);
+    write(arr[2]);
+    write(arr[3]);
+    write(arr[4]);
+    write('\n');
+}
+
+fn main() {
+    write_array(return_hello());
+}

@@ -81,13 +81,25 @@ class TemporaryVariableGenerator:
             self.__counter, var_type, virtual_address)
         self.__counter += 1
 
-        key = var_type
-        if var_type != 'pointer':
-            key = var_type.canonical()
-        if key not in self.__count:
-            self.__count[key] = 1
+        key = None
+        size = 1
+        if var_type == 'pointer':
+            key = 'pointer'
+        elif var_type.is_array():
+            subtype = var_type
+            while subtype.is_array():
+                array_type = subtype.type()
+                size *= array_type.length().value()
+                subtype = array_type.type()
+            key = subtype.canonical()
+            size = var_type.type().accumulated_magnitudes()[0]
         else:
-            self.__count[key] += 1
+            key = var_type.canonical()
+
+        if key not in self.__count:
+            self.__count[key] = size
+        else:
+            self.__count[key] += size
 
         return new_temporary_variable
 
@@ -213,7 +225,7 @@ class Parser():
                 self.__temp_function_identifier, p[-1])
             return
         virtual_address = self.__virtual_address_controller.acquire(
-            Scope.GLOBAL, Type(p[-1]))
+            Scope.GLOBAL, p[-1])
         self.__temp_function_identifier.set_virtual_address(
             virtual_address)
         function_entry = self.__dir_func.function_entry(
@@ -268,7 +280,7 @@ class Parser():
             sys.exit(1)
 
     def p_function_return_type(self, p):
-        "function_return_type : RIGHT_ARROW primitive_type"
+        "function_return_type : RIGHT_ARROW type"
         p[0] = p[2]
 
     def p_statements(self, p):
@@ -513,9 +525,14 @@ class Parser():
     def p_assignment_expression(self, p):
         "assignment_expression : expression '=' expression"
 
-        if p[1].type() != p[3].type():
+        if p[1].type().canonical() != p[3].type().canonical():
             print(
                 f"Cannot assign right expression of type {p[3].type().canonical()} to left expression of type {p[1].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if p[1].type().is_array() and (not p[3].type().is_array() or p[1].type().type().length().value() != p[3].type().type().length().value()):
+            print(
+                f"Cannot assign right expression of type {p[3].type().canonical()} of length {p[3].type().type().length().value()} to left expression of type {p[1].type().canonical()} of length {p[1].type().type().length().value()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = AssignmentExpression(p[1], p[3])
@@ -621,6 +638,10 @@ class Parser():
         "index_expression_point_1 :"
         typed_identifier = self.__dir_func.get_typed_local_or_static_identifier(
             self.__temp_function_identifier, p[-1])
+        if typed_identifier is None:
+            print(
+                f"Use of undeclared identifier '{p[-1].identifier()}' in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
         if not typed_identifier.type().is_array():
             print(
                 f"Cannot perform indexing for identifier '{p[-1].identifier()}' of type {p[-1].type().canonical()} in line {self.lexer.lexer.lineno}")
@@ -724,7 +745,8 @@ class Parser():
             function_entry = self.__dir_func.function_entry(p[1])
             return_virtual_address = function_entry.return_virtual_address()
             p[1].set_virtual_address(return_virtual_address)
-            p[0] = CallExpression(p[1], [], self.__dir_func)
+            p[0] = CallExpression(p[1], [], self.__dir_func,
+                                  self.__temp_var_generator)
         else:
             call_params_types: list[Type] = list(
                 map(lambda param: param.type(), p[4]))
@@ -764,7 +786,7 @@ class Parser():
 
             size = 1
             if p[1].type().is_array():
-                size = p[1].type().type().length().value()
+                size = p[1].type().type().accumulated_magnitudes()[0]
             self.__quadruples.append([
                 'Parameter',
                 p[1].operand(),
@@ -778,7 +800,7 @@ class Parser():
 
             size = 1
             if p[3].type().is_array():
-                size = p[3].type().type().length().value()
+                size = p[3].type().type().accumulated_magnitudes()[0]
             self.__quadruples.append([
                 'Parameter',
                 p[3].operand(),
@@ -804,24 +826,29 @@ class Parser():
         function_return_type: Optional[Type] = None
         frt = self.__dir_func.function_entry(
             self.__temp_function_identifier).return_type()
-        if frt != None:
-            function_return_type = Type(frt)
+        if frt is not None:
+            function_return_type = frt
 
-        if function_return_type == None:
+        if function_return_type is None:
             print(
                 f'Returning an expression from a function with no return type is not allowed. Line {self.lexer.lexer.lineno}')
             sys.exit(1)
 
-        if function_return_type != p[2].type():
+        if function_return_type.canonical() != p[2].type().canonical():
             print(
-                f"Return expression of type {p[2].type().canonical()} does not match function declaration return type {function_return_type.canonical()}")
+                f"Return expression of type {p[2].type().canonical()} does not match function declaration return type {function_return_type.canonical()}. Line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if function_return_type.is_array() and (not function_return_type.is_array() or function_return_type.type().length().value() != p[2].type().type().length().value()):
+            print(
+                f"Return expression of type {p[2].type().canonical()} of length {p[2].type().type().length().value()} does not match function declaration return type {function_return_type.canonical()} of length {function_return_type.type().length().value()}. Line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = ReturnExpression(p[2])
 
         size = 1
         if p[2].type().is_array():
-            size = p[2].type().type().length().value()
+            size = p[2].type().type().accumulated_magnitudes()[0]
         self.__quadruples.append([
             'Return',
             p[2].operand(),

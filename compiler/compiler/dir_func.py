@@ -49,7 +49,7 @@ class FunctionEntry:
         self,
         identifier: Identifier,
         parameters: dict[str, FunctionParameter] = {},
-        return_type: Optional[PrimitiveType] = None,
+        return_type: Optional[Type] = None,
         let_statements: dict[str, LetStatement] = {},
         temporary_variables_count: dict[str, int] = {},
         start_quadruple_index: int = -1,
@@ -81,10 +81,10 @@ class FunctionEntry:
         self.__let_statements[let_statement.identifier(
         ).identifier()] = copy.deepcopy(let_statement)
 
-    def set_return_type(self, return_type: PrimitiveType):
+    def set_return_type(self, return_type: Type):
         self.__return_type = copy.deepcopy(return_type)
 
-    def return_type(self) -> Optional[PrimitiveType]:
+    def return_type(self) -> Optional[Type]:
         return copy.deepcopy(self.__return_type)
 
     def identifier(self) -> Identifier:
@@ -203,7 +203,7 @@ class DirFunc:
         self.__functions[function_identifier.identifier()].add_parameter(
             function_parameter)
 
-    def add_function_return_type(self, function_identifier: Identifier, return_type: PrimitiveType):
+    def add_function_return_type(self, function_identifier: Identifier, return_type: Type):
         self.__functions[function_identifier.identifier()
                          ].set_return_type(return_type)
 
@@ -303,10 +303,16 @@ class DirFunc:
             primitive_type = subtype.type()
             result[primitive_type.canonical()] += size
         for _function_name, function_entry in self.__functions.items():
-            return_type = function_entry.return_type()
-            if return_type is None:
+            size: int = 1
+            subtype = function_entry.return_type()
+            while subtype is not None and subtype.is_array():
+                array_type = subtype.type()
+                size *= array_type.length().value()
+                subtype = array_type.type()
+            if subtype is None:
                 continue
-            result[return_type.canonical()] += 1
+            primitive_type = subtype.type()
+            result[primitive_type.canonical()] += size
         return copy.deepcopy(result)
 
     def to_dict(self):

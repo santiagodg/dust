@@ -82,8 +82,8 @@ class VirtualMachine:
             temporary_count=obj['function_directory']['main']['temporary_memory'],
             constant_table=obj['constant_table'],
         )
-        local_memory = {}
-        current_era = None
+        local_memory = []
+        current_era = []
         current_function = ['main']
         ip_stack = []
         while instruction_pointer < len(obj['quadruples']):
@@ -225,35 +225,36 @@ class VirtualMachine:
                 instruction_pointer += 1
                 continue
             if quadruple[0] == 'ERA':
-                local_memory = {
+                local_memory.append({
                     'bool': [False] * obj['function_directory'][quadruple[1]]['local_memory']['bool'],
                     'char': [''] * obj['function_directory'][quadruple[1]]['local_memory']['char'],
                     'i32': [0] * obj['function_directory'][quadruple[1]]['local_memory']['i32'],
                     'f64': [0] * obj['function_directory'][quadruple[1]]['local_memory']['f64'],
-                }
-                current_era = quadruple[1]
+                })
+                current_era.append(quadruple[1])
                 instruction_pointer += 1
                 continue
             if quadruple[0] == 'Parameter':
-                address = obj['function_directory'][current_era]['parameters'][quadruple[3] - 1]
+                address = obj['function_directory'][current_era[-1]
+                                                    ]['parameters'][quadruple[3] - 1]
                 virtual_address = address % 20000
                 offset = virtual_address % 1000
                 if virtual_address // 1000 == 0:
                     for i in range(quadruple[2]):
                         value = memory.get(quadruple[1] + i)
-                        local_memory['bool'][offset + i] = value
+                        local_memory[-1]['bool'][offset + i] = value
                 if virtual_address // 1000 == 1:
                     for i in range(quadruple[2]):
                         value = memory.get(quadruple[1] + i)
-                        local_memory['char'][offset + i] = value
+                        local_memory[-1]['char'][offset + i] = value
                 if virtual_address // 1000 == 2:
                     for i in range(quadruple[2]):
                         value = memory.get(quadruple[1] + i)
-                        local_memory['i32'][offset + i] = value
+                        local_memory[-1]['i32'][offset + i] = value
                 if virtual_address // 1000 == 3:
                     for i in range(quadruple[2]):
                         value = memory.get(quadruple[1] + i)
-                        local_memory['f64'][offset + i] = value
+                        local_memory[-1]['f64'][offset + i] = value
                 instruction_pointer += 1
                 continue
             if quadruple[0] == 'Gosub':
@@ -265,14 +266,14 @@ class VirtualMachine:
                     'pointer': [0] * obj['function_directory'][quadruple[1]]['temporary_memory']['pointer'],
                 }
                 memory.push_local_scope(
-                    local_memory=local_memory,
+                    local_memory=local_memory.pop(),
                     temporary_memory=temporary_memory,
                 )
-                local_memory = {}
                 ip_stack.append(instruction_pointer + 1)
                 instruction_pointer = obj['function_directory'][quadruple[1]
                                                                 ]['start_quadruple']
                 current_function.append(quadruple[1])
+                current_era.pop()
                 continue
             if quadruple[0] == 'Return':
                 if quadruple[2] != 0:

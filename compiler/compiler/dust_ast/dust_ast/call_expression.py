@@ -18,7 +18,7 @@ class CallExpression:
 
         return_type = dir_func.function_entry(self.__identifier).return_type()
         if return_type is not None:
-            self.__type = Type(return_type)
+            self.__type = return_type
 
         if self.__type is not None:
             self.__temporary_variable = temp_var_generator.next(self.__type)

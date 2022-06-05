@@ -37,10 +37,15 @@ class AssignmentExpression:
         left_expression_temporary_variable = self.__left_expression.operand()
         right_expression_temporary_variable = self.__right_expression.operand()
 
+        size = 1
+        if self.__right_expression.type().is_array():
+            size = self.__right_expression.type(
+            ).type().accumulated_magnitudes()[0]
+
         return [[
             '=',
             right_expression_temporary_variable,
-            None,
+            size,
             left_expression_temporary_variable
         ]]
 
