@@ -66,10 +66,13 @@ class CallExpression:
             ],
         ]
         if self.__type is not None:
+            size = 1
+            if self.__type.is_array():
+                size = self.__type.type().length().value()
             quads.append([
                 '=',
                 self.__identifier,
-                None,
+                size,
                 self.__temporary_variable,
             ])
         return quads

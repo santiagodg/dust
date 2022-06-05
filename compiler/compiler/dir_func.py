@@ -57,13 +57,14 @@ class FunctionEntry:
         local_variable_count: dict[str, int] = {},
     ):
 
-        self.__identifier = identifier
+        self.__identifier = copy.deepcopy(identifier)
         self.__parameters = copy.deepcopy(parameters)
-        self.__return_type = return_type
-        self.__let_statements = let_statements
-        self.__temporary_variables_count = temporary_variables_count
-        self.__start_quadruple_index = start_quadruple_index
-        self.__return_virtual_address = return_virtual_address
+        self.__return_type = copy.deepcopy(return_type)
+        self.__let_statements = copy.deepcopy(let_statements)
+        self.__temporary_variables_count = copy.deepcopy(
+            temporary_variables_count)
+        self.__start_quadruple_index = copy.deepcopy(start_quadruple_index)
+        self.__return_virtual_address = copy.deepcopy(return_virtual_address)
         self.__local_variable_count = copy.deepcopy(local_variable_count)
 
     def exists_identifier(self, variable_identifier: Identifier) -> bool:
@@ -78,10 +79,10 @@ class FunctionEntry:
 
     def add_let_statement(self, let_statement: LetStatement):
         self.__let_statements[let_statement.identifier(
-        ).identifier()] = let_statement
+        ).identifier()] = copy.deepcopy(let_statement)
 
     def set_return_type(self, return_type: PrimitiveType):
-        self.__return_type = return_type
+        self.__return_type = copy.deepcopy(return_type)
 
     def return_type(self) -> Optional[PrimitiveType]:
         return copy.deepcopy(self.__return_type)
@@ -108,16 +109,16 @@ class FunctionEntry:
         self.__temporary_variables_count = copy.deepcopy(count)
 
     def get_start_quadruple_index(self) -> int:
-        return self.__start_quadruple_index
+        return copy.deepcopy(self.__start_quadruple_index)
 
     def set_start_quadruple_index(self, index: int):
-        self.__start_quadruple_index = index
+        self.__start_quadruple_index = copy.deepcopy(index)
 
     def return_virtual_address(self):
-        return self.__return_virtual_address
+        return copy.deepcopy(self.__return_virtual_address)
 
     def set_return_virtual_address(self, virtual_address):
-        self.__return_virtual_address = virtual_address
+        self.__return_virtual_address = copy.deepcopy(virtual_address)
 
     def get_local_variable_count(self):
         """Get local variable count.
@@ -180,8 +181,8 @@ class DirFunc:
         functions: dict[str, FunctionEntry] = {},
     ):
 
-        self.__static_items = static_items
-        self.__functions = functions
+        self.__static_items = copy.deepcopy(static_items)
+        self.__functions = copy.deepcopy(functions)
 
     def add_static_item(self, static_item: StaticItem) -> Optional[DirFuncError]:
         identifier_str = static_item.identifier().identifier()
@@ -247,13 +248,15 @@ class DirFunc:
             function_entry = self.__functions[function_identifier.identifier()]
 
             if function_entry.exists_identifier(identifier):
-                return function_entry.get_typed_local_identifier(identifier)
+                return copy.deepcopy(function_entry.get_typed_local_identifier(identifier))
 
         return None
 
     def function_parameters_match(self, function_identifier: Identifier, parameter_types: list[Type]) -> bool:
         for p1, p2 in zip(parameter_types, self.__functions[function_identifier.identifier()].parameter_type_list()):
-            if p1 != p2:
+            if p1.canonical() != p2.canonical():
+                return False
+            if p2.is_array() and (not p1.is_array() or p2.type().length().value() != p1.type().length().value()):
                 return False
 
         return True
@@ -262,7 +265,8 @@ class DirFunc:
         return copy.deepcopy(self.__functions[function_identifier.identifier()])
 
     def set_function_entry(self, function_identifier: Identifier, function_entry: FunctionEntry):
-        self.__functions[function_identifier.identifier()] = function_entry
+        self.__functions[function_identifier.identifier()] = copy.deepcopy(
+            function_entry)
 
     def add_temporary_variable_count(self, function_identifier: Identifier, count: dict[str, int]):
         if function_identifier.identifier() not in self.__functions:
@@ -271,7 +275,7 @@ class DirFunc:
             sys.exit(1)
 
         self.__functions[function_identifier.identifier(
-        )].set_temporary_variable_count(count)
+        )].set_temporary_variable_count(copy.deepcopy(count))
 
     def set_function_start_quadruple_index(self, function_identifier: Identifier, index: int):
         if function_identifier.identifier() not in self.__functions:
@@ -280,7 +284,7 @@ class DirFunc:
             sys.exit(1)
 
         self.__functions[function_identifier.identifier(
-        )].set_start_quadruple_index(index)
+        )].set_start_quadruple_index(copy.deepcopy(index))
 
     def globals_table(self):
         result = {
@@ -303,7 +307,7 @@ class DirFunc:
             if return_type is None:
                 continue
             result[return_type.canonical()] += 1
-        return result
+        return copy.deepcopy(result)
 
     def to_dict(self):
         result = {}
@@ -321,7 +325,7 @@ class DirFunc:
             result[function_name]['local_memory'] = function_entry.get_local_variable_count()
             result[function_name]['temporary_memory'] = function_entry.get_temporary_variable_count()
             result[function_name]['start_quadruple'] = function_entry.get_start_quadruple_index()
-        return result
+        return copy.deepcopy(result)
 
     def __repr__(self):
         return self.__str__()

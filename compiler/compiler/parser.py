@@ -264,7 +264,7 @@ class Parser():
 
         if id_exists:
             print(
-                f"Multiple declaration: local identifier '{p[-1].identifier()}' in function '{self.__temp_function_identifier.identifier()}' in line {self.lexer.lexer.lineno}")
+                f"Multiple declaration: parameter identifier '{p[-1].identifier()}' in function '{self.__temp_function_identifier.identifier()}' in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
     def p_function_return_type(self, p):
@@ -762,10 +762,13 @@ class Parser():
         if len(p) == 2:
             self.__call_parameter_count = 1
 
+            size = 1
+            if p[1].type().is_array():
+                size = p[1].type().type().length().value()
             self.__quadruples.append([
                 'Parameter',
                 p[1].operand(),
-                None,
+                size,
                 self.__call_parameter_count
             ])
 
@@ -773,10 +776,13 @@ class Parser():
         else:
             self.__call_parameter_count += 1
 
+            size = 1
+            if p[3].type().is_array():
+                size = p[3].type().type().length().value()
             self.__quadruples.append([
                 'Parameter',
                 p[3].operand(),
-                None,
+                size,
                 self.__call_parameter_count
             ])
 
@@ -813,10 +819,13 @@ class Parser():
 
         p[0] = ReturnExpression(p[2])
 
+        size = 1
+        if p[2].type().is_array():
+            size = p[2].type().type().length().value()
         self.__quadruples.append([
             'Return',
             p[2].operand(),
-            None,
+            size,
             self.__temp_function_identifier
         ])
 
@@ -838,7 +847,7 @@ class Parser():
         self.__quadruples.append([
             'Return',
             None,
-            None,
+            0,
             None,
         ])
 
@@ -1066,7 +1075,7 @@ class Parser():
     def p_sum_expression(self, p):
         "sum_expression : SUM '(' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
                 f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
             sys.exit(1)

@@ -88,6 +88,7 @@ class VirtualMachine:
         ip_stack = []
         while instruction_pointer < len(obj['quadruples']):
             quadruple = obj['quadruples'][instruction_pointer]
+            # print(quadruple)
             if quadruple[0] == 'Goto':
                 instruction_pointer = quadruple[3]
                 continue
@@ -207,11 +208,20 @@ class VirtualMachine:
                 instruction_pointer += 1
                 continue
             if quadruple[0] == '=':
-                value = memory.get(quadruple[1])
-                if quadruple[3] // 10000 == 3 and (quadruple[3] % 10000) // 1000 == 4:
-                    memory.put_value_to_pointed(quadruple[3], value)
+                if quadruple[2] is not None and quadruple[2] != 0:
+                    for i in range(quadruple[2]):
+                        value = memory.get(quadruple[1] + i)
+                        if quadruple[3] // 10000 == 3 and (quadruple[3] % 10000) // 1000 == 4:
+                            memory.put_value_to_pointed(
+                                quadruple[3] + i, value)
+                        else:
+                            memory.put(quadruple[3] + i, value)
                 else:
-                    memory.put(quadruple[3], value)
+                    value = memory.get(quadruple[1])
+                    if quadruple[3] // 10000 == 3 and (quadruple[3] % 10000) // 1000 == 4:
+                        memory.put_value_to_pointed(quadruple[3], value)
+                    else:
+                        memory.put(quadruple[3], value)
                 instruction_pointer += 1
                 continue
             if quadruple[0] == 'ERA':
@@ -225,18 +235,25 @@ class VirtualMachine:
                 instruction_pointer += 1
                 continue
             if quadruple[0] == 'Parameter':
-                value = memory.get(quadruple[1])
                 address = obj['function_directory'][current_era]['parameters'][quadruple[3] - 1]
                 virtual_address = address % 20000
                 offset = virtual_address % 1000
                 if virtual_address // 1000 == 0:
-                    local_memory['bool'][offset] = value
+                    for i in range(quadruple[2]):
+                        value = memory.get(quadruple[1] + i)
+                        local_memory['bool'][offset + i] = value
                 if virtual_address // 1000 == 1:
-                    local_memory['char'][offset] = value
+                    for i in range(quadruple[2]):
+                        value = memory.get(quadruple[1] + i)
+                        local_memory['char'][offset + i] = value
                 if virtual_address // 1000 == 2:
-                    local_memory['i32'][offset] = value
+                    for i in range(quadruple[2]):
+                        value = memory.get(quadruple[1] + i)
+                        local_memory['i32'][offset + i] = value
                 if virtual_address // 1000 == 3:
-                    local_memory['f64'][offset] = value
+                    for i in range(quadruple[2]):
+                        value = memory.get(quadruple[1] + i)
+                        local_memory['f64'][offset + i] = value
                 instruction_pointer += 1
                 continue
             if quadruple[0] == 'Gosub':
@@ -258,9 +275,10 @@ class VirtualMachine:
                 current_function.append(quadruple[1])
                 continue
             if quadruple[0] == 'Return':
-                if quadruple[1] is not None:
-                    value = memory.get(quadruple[1])
-                    memory.put(quadruple[3], value)
+                if quadruple[2] != 0:
+                    for i in range(quadruple[2]):
+                        value = memory.get(quadruple[1] + i)
+                        memory.put(quadruple[3] + i, value)
                 memory.pop_local_scope()
                 instruction_pointer = ip_stack.pop()
                 current_function.pop()

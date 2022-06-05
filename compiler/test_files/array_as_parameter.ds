@@ -1,0 +1,13 @@
+fn write_two_values(arr: [char; 2]) {
+    write(arr[0]);
+    write(arr[1]);
+    write('\n');
+}
+
+fn main()
+let main_array: [char; 2];
+{
+    main_array[0] = 'a';
+    main_array[1] = 'b';
+    write_two_values(main_array);
+}
