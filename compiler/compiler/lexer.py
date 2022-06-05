@@ -65,7 +65,7 @@ class Lexer:
         r"'([^'\\]|\\.)'"
         constant_literal_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
-            if value == t.value[1:-1]:
+            if value == t.value[1:-1] and isinstance(value, str):
                 constant_literal_virtual_address = virtual_address
                 break
         if constant_literal_virtual_address is None:
@@ -80,7 +80,7 @@ class Lexer:
         r'[0-9][0-9]*\.[0-9][0-9]*'
         constant_literal_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
-            if value == float(t.value):
+            if value == float(t.value) and isinstance(value, float):
                 constant_literal_virtual_address = virtual_address
                 break
         if constant_literal_virtual_address is None:
@@ -96,7 +96,7 @@ class Lexer:
         r'[0-9][0-9]*'
         constant_literal_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
-            if value == int(t.value):
+            if value == int(t.value) and isinstance(value, int):
                 constant_literal_virtual_address = virtual_address
                 break
         if constant_literal_virtual_address is None:
@@ -113,7 +113,7 @@ class Lexer:
         t.value = t.value == 'true'
         constant_literal_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
-            if value == t.value:
+            if value == t.value and isinstance(value, bool):
                 constant_literal_virtual_address = virtual_address
                 break
         if constant_literal_virtual_address is None:

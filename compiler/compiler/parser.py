@@ -376,7 +376,7 @@ class Parser():
                               | BOOL_LITERAL"""
         constant_literal_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
-            if value == p[1].value():
+            if value == p[1].value() and type(value) == type(p[1].value()):
                 constant_literal_virtual_address = virtual_address
                 break
         if constant_literal_virtual_address is None:
@@ -588,7 +588,7 @@ class Parser():
             sys.exit(1)
         constant_0_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
-            if value == 0:
+            if value == 0 and isinstance(value, int):
                 constant_0_virtual_address = virtual_address
                 break
         if constant_0_virtual_address is None:
@@ -614,7 +614,7 @@ class Parser():
         addr_value = typed_identifier.operand().addr()
         constant_addr_value_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
-            if value == addr_value:
+            if value == addr_value and type(value) == type(addr_value):
                 constant_addr_value_virtual_address = virtual_address
                 break
         if constant_addr_value_virtual_address is None:
@@ -661,7 +661,7 @@ class Parser():
             sys.exit(1)
         constant_0_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
-            if value == 0:
+            if value == 0 and isinstance(value, int):
                 constant_0_virtual_address = virtual_address
                 break
         if constant_0_virtual_address is None:
@@ -671,7 +671,8 @@ class Parser():
         constant_upper_limit_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
             if value == self.__array_current_identifier[-1].type().type().shape()[
-                    self.__array_dimension_stack[-1] - 1]:
+                    self.__array_dimension_stack[-1] - 1] and type(value) == type(self.__array_current_identifier[-1].type().type().shape()[
+                    self.__array_dimension_stack[-1] - 1]):
                 constant_upper_limit_virtual_address = virtual_address
                 break
         if constant_upper_limit_virtual_address is None:
@@ -694,7 +695,7 @@ class Parser():
                 self.__array_dimension_stack[-1]]
             constant_upper_limit_virtual_address = None
             for virtual_address, value in self.__constant_table.items():
-                if value == m:
+                if value == m and type(value) == type(m):
                     constant_upper_limit_virtual_address = virtual_address
                     break
             if constant_upper_limit_virtual_address is None:
@@ -997,9 +998,14 @@ class Parser():
     def p_histogram_expression(self, p):
         "histogram_expression : HISTOGRAM '(' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1:
+            print(
+                f"Parameter must be array of a single dimension in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = HistogramExpression(p[3])

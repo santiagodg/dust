@@ -348,5 +348,14 @@ class VirtualMachine:
                 plt.show()
                 instruction_pointer += 1
                 continue
+            if quadruple[0] == 'histogram':
+                xs = []
+                for i in range(quadruple[3]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                plt.hist(xs)
+                plt.show()
+                instruction_pointer += 1
+                continue
             print(f'Failed to execute quadruple: {quadruple}')
             sys.exit(1)
