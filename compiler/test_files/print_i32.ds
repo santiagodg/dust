@@ -1,0 +1,95 @@
+fn i32_to_char(num: i32) -> char {
+    if num / 10 > 0 {
+        return '?';
+    };
+
+    if num == 0 {
+        return '0';
+    };
+
+    if num == 1 {
+        return '1';
+    };
+
+    if num == 2 {
+        return '2';
+    };
+
+    if num == 3 {
+        return '3';
+    };
+
+    if num == 4 {
+        return '4';
+    };
+
+    if num == 5 {
+        return '5';
+    };
+
+    if num == 6 {
+        return '6';
+    };
+
+    if num == 7 {
+        return '7';
+    };
+
+    if num == 8 {
+        return '8';
+    };
+
+    if num == 9 {
+        return '9';
+    };
+
+    return '?';
+}
+
+fn print_i32(num: i32)
+let buffer: [char; 10];
+let num_digits: i32;
+let modulo: i32;
+let index: i32;
+let char_result: char;
+{
+    if num == 0 {
+        write('0');
+        write('\n');
+        return;
+    };
+
+    if num < 0 {
+        write('-');
+        num = num * -1;
+    };
+
+    num_digits = 0;
+
+    while num > 0 && num_digits < 10 {
+        modulo = num % 10;
+        char_result = i32_to_char(modulo);
+        buffer[num_digits] = char_result;
+        num = num / 10;
+        num_digits = num_digits + 1;
+    };
+
+    index = num_digits - 1;
+
+    while index >= 0 {
+        write(buffer[index]);
+        index = index - 1;
+    };
+
+    write('\n');
+}
+
+fn main() {
+    print_i32(-4294967295);
+    print_i32(-20);
+    print_i32(-1);
+    print_i32(0);
+    print_i32(1);
+    print_i32(34);
+    print_i32(4294967295);
+}

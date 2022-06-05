@@ -1,0 +1,5 @@
+fn main()
+let num: i32;
+{
+    num = -1;
+}

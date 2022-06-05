@@ -29,7 +29,7 @@ class _ScopeTypeCounter:
         if addr_type == 'pointer':
             self.__counter[scope]['pointer'] += amount
             return
-        self.__counter[scope][addr_type.canonical()] += amount
+        self.__counter[scope][addr_type] += amount
 
     def value(self, scope, addr_type):
         """Return the current value of the specified counter.
@@ -48,7 +48,7 @@ class _ScopeTypeCounter:
         """
         if addr_type == 'pointer':
             return self.__counter[scope]['pointer']
-        return self.__counter[scope][addr_type.canonical()]
+        return self.__counter[scope][addr_type]
 
     def clear_scope(self, scope):
         """Clear local scope.

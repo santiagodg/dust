@@ -6,7 +6,7 @@ from .dust_type import Type
 
 
 class CallExpression:
-    def __init__(self, identifier: Identifier, call_params, dir_func):
+    def __init__(self, identifier: Identifier, call_params, dir_func, temp_var_generator):
         """
         identifier: Identifier
         call_params: list[Expression]
@@ -17,8 +17,11 @@ class CallExpression:
         self.__type: Optional[Type] = None
 
         return_type = dir_func.function_entry(self.__identifier).return_type()
-        if return_type != None:
+        if return_type is not None:
             self.__type = Type(return_type)
+
+        if self.__type is not None:
+            self.__temporary_variable = temp_var_generator.next(self.__type)
 
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
@@ -51,7 +54,25 @@ class CallExpression:
         :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
         """
 
-        return self.__identifier
+        return self.__temporary_variable
+
+    def quadruples(self):
+        quads = [
+            [
+                'Gosub',
+                self.__identifier.identifier(),
+                None,
+                None
+            ],
+        ]
+        if self.__type is not None:
+            quads.append([
+                '=',
+                self.__identifier,
+                None,
+                self.__temporary_variable,
+            ])
+        return quads
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__

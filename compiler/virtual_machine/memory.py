@@ -39,6 +39,7 @@ class Memory:
             'char': [''] * temporary_count['char'],
             'i32': [0] * temporary_count['i32'],
             'f64': [0] * temporary_count['f64'],
+            'pointer': [0] * temporary_count['pointer'],
         }
         constant_count = {
             'bool': 0,
@@ -96,7 +97,8 @@ class Memory:
             if virtual_address // 1000 == 0:
                 return self.__locals_top['bool'][virtual_address % 1000]
             if virtual_address // 1000 == 1:
-                return self.__locals_top['char'][virtual_address % 1000]
+                return_value = self.__locals_top['char'][virtual_address % 1000]
+                return return_value
             if virtual_address // 1000 == 2:
                 return self.__locals_top['i32'][virtual_address % 1000]
             if virtual_address // 1000 == 3:
@@ -106,11 +108,16 @@ class Memory:
             if virtual_address // 1000 == 0:
                 return self.__temporaries_top['bool'][virtual_address % 1000]
             if virtual_address // 1000 == 1:
-                return self.__temporaries_top['char'][virtual_address % 1000]
+                return_value = self.__temporaries_top['char'][virtual_address % 1000]
+                return return_value
             if virtual_address // 1000 == 2:
                 return self.__temporaries_top['i32'][virtual_address % 1000]
             if virtual_address // 1000 == 3:
                 return self.__temporaries_top['f64'][virtual_address % 1000]
+            if virtual_address // 1000 == 4:
+                pointer_address = self.__temporaries_top['pointer'][virtual_address % 1000]
+                return_value = self.get(pointer_address)
+                return return_value
         elif address // 10000 == 4:
             virtual_address = address % 40000
             if virtual_address // 1000 == 0:
@@ -163,6 +170,9 @@ class Memory:
                 self.__temporaries_top['i32'][virtual_address % 1000] = value
             if virtual_address // 1000 == 3:
                 self.__temporaries_top['f64'][virtual_address % 1000] = value
+            if virtual_address // 1000 == 4:
+                self.__temporaries_top['pointer'][virtual_address %
+                                                  1000] = value
         elif address // 10000 == 4:
             virtual_address = address % 40000
             if virtual_address // 1000 == 0:
@@ -173,6 +183,10 @@ class Memory:
                 self.__constants['i32'][virtual_address % 1000] = value
             if virtual_address // 1000 == 3:
                 self.__constants['f64'][virtual_address % 1000] = value
+
+    def put_value_to_pointed(self, address, value):
+        pointed_address = self.__temporaries_top['pointer'][address % 1000]
+        self.put(pointed_address, value)
 
     def push_local_scope(self, local_memory, temporary_memory):
         """Start a local scope with new local_memory and temporary_memory.

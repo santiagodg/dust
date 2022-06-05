@@ -12,8 +12,6 @@ VirtualAddressControllerConcrete : implements VirtualAddressController
 from abc import ABC, abstractmethod
 import sys
 
-from ..dust_ast import PrimitiveType
-
 from .virtual_address import VirtualAddress, VirtualAddressConcrete
 from ._scope_type_counter import _ScopeTypeCounter
 from .scope import Scope
@@ -175,7 +173,7 @@ class VirtualAddressControllerConcrete(VirtualAddressControllerInterface):
         for primitive_type in ['bool', 'char', 'i32', 'f64']:
             result[primitive_type] = self.__counter.value(
                 Scope.LOCAL,
-                PrimitiveType(primitive_type),
+                primitive_type,
             )
         return result
 
@@ -208,10 +206,10 @@ class VirtualAddressControllerConcrete(VirtualAddressControllerInterface):
             size *= array_type.length().value()
             subtype = array_type.type()
         primitive_type = subtype.type()
-        offset = self.__counter.value(scope, primitive_type)
+        offset = self.__counter.value(scope, primitive_type.canonical())
         if offset + size > self.__limits[scope]['types'][primitive_type.canonical()]['max_amount']:
             print(
                 f'Error: VirtualAddressControllerConcrete.acquire(): ran out of addresses to release for scope {scope} and type {addr_type}.')
             sys.exit(1)
-        self.__counter.increment(scope, primitive_type, size)
+        self.__counter.increment(scope, primitive_type.canonical(), size)
         return VirtualAddressConcrete(scope, primitive_type, offset)

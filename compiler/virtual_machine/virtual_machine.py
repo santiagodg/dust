@@ -6,6 +6,8 @@ VirtualMachine:
     Execute object files.
 """
 
+import sys
+
 from .memory import Memory
 
 
@@ -52,7 +54,8 @@ class VirtualMachine:
                             "bool": 0,
                             "char": 0,
                             "i32": 0,
-                            "f64": 0
+                            "f64": 0,
+                            "pointer": 0,
                         }
                     }
                 },
@@ -86,8 +89,7 @@ class VirtualMachine:
         while instruction_pointer < len(obj['quadruples']):
             quadruple = obj['quadruples'][instruction_pointer]
             if quadruple[0] == 'Goto':
-                instruction_pointer = obj['function_directory'][quadruple[3]
-                                                                ]['start_quadruple']
+                instruction_pointer = quadruple[3]
                 continue
             if quadruple[0] == 'GotoF':
                 value = memory.get(quadruple[1])
@@ -102,12 +104,6 @@ class VirtualMachine:
                     instruction_pointer = int(quadruple[3])
                 else:
                     instruction_pointer += 1
-                continue
-            if quadruple[0] == '-':
-                value = memory.get(quadruple[1])
-                result = -value
-                memory.put(quadruple[3], result)
-                instruction_pointer += 1
                 continue
             if quadruple[0] == '!':
                 value = memory.get(quadruple[1])
@@ -212,7 +208,10 @@ class VirtualMachine:
                 continue
             if quadruple[0] == '=':
                 value = memory.get(quadruple[1])
-                memory.put(quadruple[3], value)
+                if quadruple[3] // 10000 == 3 and (quadruple[3] % 10000) // 1000 == 4:
+                    memory.put_value_to_pointed(quadruple[3], value)
+                else:
+                    memory.put(quadruple[3], value)
                 instruction_pointer += 1
                 continue
             if quadruple[0] == 'ERA':
@@ -246,6 +245,7 @@ class VirtualMachine:
                     'char': [''] * obj['function_directory'][quadruple[1]]['temporary_memory']['char'],
                     'i32': [0] * obj['function_directory'][quadruple[1]]['temporary_memory']['i32'],
                     'f64': [0] * obj['function_directory'][quadruple[1]]['temporary_memory']['f64'],
+                    'pointer': [0] * obj['function_directory'][quadruple[1]]['temporary_memory']['pointer'],
                 }
                 memory.push_local_scope(
                     local_memory=local_memory,
@@ -258,18 +258,19 @@ class VirtualMachine:
                 current_function.append(quadruple[1])
                 continue
             if quadruple[0] == 'Return':
-                value = memory.get(quadruple[1])
-                memory.put(quadruple[3], value)
+                if quadruple[1] is not None:
+                    value = memory.get(quadruple[1])
+                    memory.put(quadruple[3], value)
                 memory.pop_local_scope()
                 instruction_pointer = ip_stack.pop()
                 current_function.pop()
                 continue
             if quadruple[0] == 'Endfunc':
-                if current_function[-1] == 'main':
-                    return
                 memory.pop_local_scope()
                 instruction_pointer = ip_stack.pop()
                 continue
+            if quadruple[0] == 'End':
+                return
             if quadruple[0] == 'write':
                 value = memory.get(quadruple[3])
                 if value == '\\n':
@@ -278,4 +279,15 @@ class VirtualMachine:
                     print(value, end='')
                 instruction_pointer += 1
                 continue
+            if quadruple[0] == 'Verify':
+                index = memory.get(quadruple[1])
+                lower_limit = memory.get(quadruple[2])
+                upper_limit = memory.get(quadruple[3])
+                if not (lower_limit <= index < upper_limit):
+                    print(
+                        f'IndexOutOfRange: index={index}, lower_limit={lower_limit}, upper_limit={upper_limit}. Quadruple #{instruction_pointer}: {quadruple}')
+                    sys.exit(1)
+                instruction_pointer += 1
+                continue
             print(f'Failed to execute quadruple: {quadruple}')
+            sys.exit(1)

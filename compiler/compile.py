@@ -1,6 +1,6 @@
 import sys
 
-from compiler import Lexer, Parser, Compiler, DirFunc, SemanticCube, pretty_print_quadruples_with_addresses, TemporaryVariable
+from compiler import Lexer, Parser, Compiler, DirFunc, SemanticCube, TemporaryVariable
 from compiler.virtual_address import VirtualAddressControllerConcrete, VirtualAddressConcrete
 from compiler.dust_ast import Identifier, BooleanLiteral, IntegerLiteral, FloatLiteral, CharLiteral
 from obj_file import ObjFile
@@ -22,7 +22,6 @@ def quadruples_to_dict(quadruples):
                 subresult.append(quadruple[i].operand().addr())
                 continue
             if isinstance(quadruple[i], (BooleanLiteral, IntegerLiteral, FloatLiteral, CharLiteral)):
-                print(quadruple)
                 subresult.append(quadruple[i].operand().addr())
                 continue
             if isinstance(quadruple[i], VirtualAddressConcrete):

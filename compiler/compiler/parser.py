@@ -97,6 +97,7 @@ class TemporaryVariableGenerator:
             'char': 0,
             'i32': 0,
             'f64': 0,
+            'pointer': 0,
         }
 
     def get_count(self) -> dict[str, int]:
@@ -173,6 +174,14 @@ class Parser():
 
         p[0] = Function(p[2], p[5], p[7], p[9], p[11])
         self.__virtual_address_controller.end_local_scope()
+        if p[2].identifier() == 'main':
+            self.__quadruples.append([
+                'End',
+                None,
+                None,
+                None,
+            ])
+            return
         self.__quadruples.append([
             'Endfunc',
             None,
@@ -194,6 +203,8 @@ class Parser():
         self.__dir_func.set_function_start_quadruple_index(
             self.__temp_function_identifier, len(self.__quadruples))
         self.__virtual_address_controller.start_local_scope()
+        if p[-1].identifier() == 'main':
+            self.__quadruples[0][3] = len(self.__quadruples)
 
     def p_function_point_2(self, p):
         "function_point_2 :"
@@ -398,7 +409,13 @@ class Parser():
             sys.exit(1)
 
         p[0] = NegationExpression(
-            p[1], p[2], self.__semantic_cube, self.__temp_var_generator)
+            p[1],
+            p[2],
+            self.__semantic_cube,
+            self.__temp_var_generator,
+            self.__constant_table,
+            self.__virtual_address_controller
+        )
         self.__quadruples += p[0].quadruples()
 
     def p_arithmetic_expression(self, p):
@@ -562,14 +579,21 @@ class Parser():
                 Scope.CONSTANT, Type(PrimitiveType('i32'))).addr()
             self.__constant_table[constant_0_virtual_address] = 0
         temp = self.__temp_var_generator.next(Type(PrimitiveType('i32')))
-        self.__quadruples += [
-            [
+        operand_1 = self.__array_temporaries.pop()
+        if isinstance(operand_1, Expression):
+            self.__quadruples.append([
                 '+',
-                self.__array_temporaries.pop(),
+                operand_1.operand(),
                 constant_0_virtual_address,
                 temp,
-            ],
-        ]
+            ])
+        else:
+            self.__quadruples.append([
+                '+',
+                operand_1,
+                constant_0_virtual_address,
+                temp,
+            ])
         addr_value = typed_identifier.operand().addr()
         constant_addr_value_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
@@ -642,8 +666,9 @@ class Parser():
                 constant_upper_limit_virtual_address,
             ],
         )
+        self.__array_temporaries.append(p[3])
         if self.__array_dimension_stack[-1] < len(self.__array_current_identifier[-1].type().type().shape()):
-            aux = p[3]
+            aux = self.__array_temporaries.pop()
             m = self.__array_current_identifier[-1].type().type().accumulated_magnitudes()[
                 self.__array_dimension_stack[-1]]
             constant_upper_limit_virtual_address = None
@@ -668,12 +693,20 @@ class Parser():
             aux2 = p[3].operand()
             self.__array_temporaries.append(
                 self.__temp_var_generator.next(Type(PrimitiveType('i32'))))
-            self.__quadruples.append([
-                '+',
-                aux1,
-                aux2,
-                copy.deepcopy(self.__array_temporaries[-1]),
-            ])
+            if isinstance(aux1, Expression):
+                self.__quadruples.append([
+                    '+',
+                    aux1.operand(),
+                    aux2,
+                    copy.deepcopy(self.__array_temporaries[-1]),
+                ])
+            else:
+                self.__quadruples.append([
+                    '+',
+                    aux1,
+                    aux2,
+                    copy.deepcopy(self.__array_temporaries[-1]),
+                ])
         self.__array_dimension_stack[-1] += 1
         p[1].append(p[3])
         p[0] = p[1]
@@ -702,14 +735,10 @@ class Parser():
             function_entry = self.__dir_func.function_entry(p[1])
             return_virtual_address = function_entry.return_virtual_address()
             p[1].set_virtual_address(return_virtual_address)
-            p[0] = CallExpression(p[1], p[4], self.__dir_func)
+            p[0] = CallExpression(
+                p[1], p[4], self.__dir_func, self.__temp_var_generator)
 
-        self.__quadruples.append([
-            'Gosub',
-            p[1].identifier(),
-            None,
-            None
-        ])
+        self.__quadruples += p[0].quadruples()
 
     def p_call_expression_point_1(self, p):
         'call_expression_point_1 :'
@@ -806,6 +835,12 @@ class Parser():
             sys.exit(1)
 
         p[0] = ReturnExpression(None)
+        self.__quadruples.append([
+            'Return',
+            None,
+            None,
+            None,
+        ])
 
     def p_special_function_expression(self, p):
         """special_function_expression : io_expression

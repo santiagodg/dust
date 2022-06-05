@@ -7,7 +7,6 @@ VirtualAddress : Specifies the location of a value in virtual memory.
 
 from abc import ABC, abstractmethod
 
-from ..dust_ast import PrimitiveType
 from .scope import Scope
 
 
@@ -23,7 +22,7 @@ class VirtualAddress(ABC):
         """Return the scope."""
 
     @abstractmethod
-    def type(self) -> PrimitiveType:
+    def type(self):
         """Return the type."""
 
 
@@ -149,5 +148,5 @@ class VirtualAddressConcrete(VirtualAddress):
     def scope(self) -> Scope:
         return self.__scope
 
-    def type(self) -> PrimitiveType:
+    def type(self):
         return self.__addr_type
