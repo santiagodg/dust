@@ -86,6 +86,7 @@ class VirtualMachine:
         current_era = []
         current_function = ['main']
         ip_stack = []
+        input_buffer = ""
         while instruction_pointer < len(obj['quadruples']):
             quadruple = obj['quadruples'][instruction_pointer]
             # print(quadruple)
@@ -290,10 +291,23 @@ class VirtualMachine:
                 continue
             if quadruple[0] == 'End':
                 return
+            if quadruple[0] == 'read':
+                while input_buffer == "":
+                    input_buffer = input()
+                value = input_buffer[0]
+                input_buffer = input_buffer[1:]
+                if quadruple[3] // 10000 == 3 and (quadruple[3] % 10000) // 1000 == 4:
+                    memory.put_value_to_pointed(quadruple[3], value)
+                else:
+                    memory.put(quadruple[3], value)
+                instruction_pointer += 1
+                continue
             if quadruple[0] == 'write':
                 value = memory.get(quadruple[3])
                 if value == '\\n':
                     print()
+                elif value == '\\\'':
+                    print('\'', end='')
                 else:
                     print(value, end='')
                 instruction_pointer += 1

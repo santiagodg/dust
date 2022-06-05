@@ -1,0 +1,57 @@
+fn main()
+let read_char: char;
+let message: [char; 26];
+let index: i32;
+{
+    message[0] = 'P';
+    message[1] = 'l';
+    message[2] = 'e';
+    message[3] = 'a';
+    message[4] = 's';
+    message[5] = 'e';
+    message[6] = ' ';
+    message[7] = 'w';
+    message[8] = 'r';
+    message[9] = 'i';
+    message[10] = 't';
+    message[11] = 'e';
+    message[12] = ' ';
+    message[13] = 'a';
+    message[14] = ' ';
+    message[15] = 'c';
+    message[16] = 'h';
+    message[17] = 'a';
+    message[18] = 'r';
+    message[19] = 'a';
+    message[20] = 'c';
+    message[21] = 't';
+    message[22] = 'e';
+    message[23] = 'r';
+    message[24] = ':';
+    message[25] = '\n';
+
+    index = 0;
+    while index < 26 {
+        write(message[index]);
+        index = index + 1;
+    };
+
+    read(read_char);
+
+    message[0] = 'R';
+    message[1] = 'e';
+    message[2] = 'a';
+    message[3] = 'd';
+    message[4] = ':';
+    message[5] = ' ';
+    message[6] = '\'';
+    message[7] = read_char;
+    message[8] = '\'';
+    message[9] = '\n';
+
+    index = 0;
+    while index < 10 {
+        write(message[index]);
+        index = index + 1;
+    };
+}

@@ -894,12 +894,18 @@ class Parser():
         """read_expression : READ '(' IDENTIFIER ')'
                            | READ '(' index_expression ')'"""
 
-        if p[3].type() != Type(PrimitiveType('char')):
+        parameter = p[3]
+        if isinstance(p[3], Identifier):
+            typed_identifier = self.__dir_func.get_typed_local_or_static_identifier(
+                self.__temp_function_identifier, p[3])
+            parameter = typed_identifier
+
+        if parameter.type().canonical() != 'char':
             print(
-                f"Parameter must be of type char in line {self.lexer.lexer.lineno}")
+                f"Parameter must be of type char, not {parameter.type().canonical()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
-        p[0] = ReadExpression(p[3])
+        p[0] = ReadExpression(parameter)
         self.__quadruples += p[0].quadruples()
 
     def p_write_expression(self, p):
