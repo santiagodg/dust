@@ -8,6 +8,8 @@ VirtualMachine:
 
 import sys
 
+import matplotlib.pyplot as plt
+
 from .memory import Memory
 
 
@@ -320,6 +322,18 @@ class VirtualMachine:
                     print(
                         f'IndexOutOfRange: index={index}, lower_limit={lower_limit}, upper_limit={upper_limit}. Quadruple #{instruction_pointer}: {quadruple}')
                     sys.exit(1)
+                instruction_pointer += 1
+                continue
+            if quadruple[0] == 'plot':
+                xs = []
+                ys = []
+                for i in range(quadruple[3]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                    value = memory.get(quadruple[2] + i)
+                    ys.append(value)
+                plt.plot(xs, ys)
+                plt.show()
                 instruction_pointer += 1
                 continue
             print(f'Failed to execute quadruple: {quadruple}')

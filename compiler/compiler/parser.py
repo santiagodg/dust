@@ -945,14 +945,24 @@ class Parser():
     def p_plot_expression(self, p):
         "plot_expression : PLOT '(' expression ',' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"First parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
-        if p[5].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[5].type().canonical() != '[f64]':
             print(
-                f"Second parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Second parameter must be of type [f64], not {p[5].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1 or len(p[5].type().type().shape()) != 1:
+            print(
+                f"Parameters must be arrays of a single dimension in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if p[3].type().type().length().value() != p[5].type().type().length().value():
+            print(
+                f'Both parameters must be arrays of same size. Parameter 1 is of length {p[3].type().type().length().value()} and parameter 2 is of length {p[5].type().type().length().value()} in line {self.lexer.lexer.lineno}')
             sys.exit(1)
 
         p[0] = PlotExpression(p[3], p[5])
