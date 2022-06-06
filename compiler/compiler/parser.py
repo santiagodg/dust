@@ -1014,14 +1014,14 @@ class Parser():
     def p_mean_expression(self, p):
         "mean_expression : MEAN '(' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
-        if p[5].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if len(p[3].type().type().shape()) != 1:
             print(
-                f"Second parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Parameter must be array of a single dimension in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = MeanExpression(p[3], self.__temp_var_generator)

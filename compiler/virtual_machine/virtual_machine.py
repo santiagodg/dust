@@ -9,6 +9,7 @@ VirtualMachine:
 import sys
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 from .memory import Memory
 
@@ -324,6 +325,105 @@ class VirtualMachine:
                     sys.exit(1)
                 instruction_pointer += 1
                 continue
+            if quadruple[0] == 'as':
+                value = memory.get(quadruple[1])
+                if quadruple[1] % 10000 // 1000 == 0:
+                    if quadruple[3] % 10000 // 1000 == 0:
+                        memory.put(quadruple[3], value)
+                    elif quadruple[3] % 10000 // 1000 == 1:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: bool to char not allowed.')
+                        sys.exit(1)
+                    elif quadruple[3] % 10000 // 1000 == 2:
+                        if value:
+                            memory.put(quadruple[3], 1)
+                        else:
+                            memory.put(quadruple[3], 0)
+                    elif quadruple[3] % 10000 // 1000 == 3:
+                        if value:
+                            memory.put(quadruple[3], 1.0)
+                        else:
+                            memory.put(quadruple[3], 0.0)
+                    else:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: {quadruple[3]} address could not be processed.')
+                        sys.exit(1)
+                elif quadruple[1] % 10000 // 1000 == 1:
+                    if quadruple[3] % 10000 // 1000 == 0:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: char to bool not allowed.')
+                        sys.exit(1)
+                    elif quadruple[3] % 10000 // 1000 == 1:
+                        memory.put(quadruple[3], value)
+                    elif quadruple[3] % 10000 // 1000 == 2:
+                        if value == '0':
+                            memory.put(quadruple[3], 0)
+                        elif value == '1':
+                            memory.put(quadruple[3], 1)
+                        elif value == '2':
+                            memory.put(quadruple[3], 2)
+                        elif value == '3':
+                            memory.put(quadruple[3], 3)
+                        elif value == '4':
+                            memory.put(quadruple[3], 4)
+                        elif value == '5':
+                            memory.put(quadruple[3], 5)
+                        elif value == '6':
+                            memory.put(quadruple[3], 6)
+                        elif value == '7':
+                            memory.put(quadruple[3], 7)
+                        elif value == '8':
+                            memory.put(quadruple[3], 8)
+                        elif value == '9':
+                            memory.put(quadruple[3], 9)
+                    elif quadruple[3] % 10000 // 1000 == 3:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: char to f64 not allowed.')
+                        sys.exit(1)
+                    else:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: {quadruple[3]} address could not be processed.')
+                        sys.exit(1)
+                elif quadruple[1] % 10000 // 1000 == 2:
+                    if quadruple[3] % 10000 // 1000 == 0:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: i32 to bool not allowed.')
+                        sys.exit(1)
+                    elif quadruple[3] % 10000 // 1000 == 1:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: i32 to char not allowed.')
+                        sys.exit(1)
+                    elif quadruple[3] % 10000 // 1000 == 2:
+                        memory.put(quadruple[3], value)
+                    elif quadruple[3] % 10000 // 1000 == 3:
+                        memory.put(quadruple[3], float(value))
+                    else:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: {quadruple[3]} address could not be processed.')
+                        sys.exit(1)
+                elif quadruple[1] % 10000 // 1000 == 3:
+                    if quadruple[3] % 10000 // 1000 == 0:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: f64 to bool not allowed.')
+                        sys.exit(1)
+                    elif quadruple[3] % 10000 // 1000 == 1:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: f64 to char not allowed.')
+                        sys.exit(1)
+                    elif quadruple[3] % 10000 // 1000 == 2:
+                        memory.put(quadruple[3], int(value))
+                    elif quadruple[3] % 10000 // 1000 == 3:
+                        memory.put(quadruple[3], value)
+                    else:
+                        print(
+                            f'Failed to execute type cast quadruple {quadruple}: {quadruple[3]} address could not be processed.')
+                        sys.exit(1)
+                else:
+                    print(
+                        f'Failed to execute type cast quadruple {quadruple}: {quadruple[1]} address could not be processed.')
+                    sys.exit(1)
+                instruction_pointer += 1
+                continue
             if quadruple[0] == 'plot':
                 xs = []
                 ys = []
@@ -355,6 +455,15 @@ class VirtualMachine:
                     xs.append(value)
                 plt.hist(xs)
                 plt.show()
+                instruction_pointer += 1
+                continue
+            if quadruple[0] == 'mean':
+                xs = []
+                for i in range(quadruple[2]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                value = np.mean(xs)
+                memory.put(quadruple[3], value)
                 instruction_pointer += 1
                 continue
             print(f'Failed to execute quadruple: {quadruple}')

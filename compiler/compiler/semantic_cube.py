@@ -259,7 +259,7 @@ class SemanticCube:
         self.__cube[hashed_char][unary_boolean_negation] = None
         self.__cube[hashed_char][as_operator] = {}
         self.__cube[hashed_char][as_operator][hashed_bool] = None
-        self.__cube[hashed_char][as_operator][hashed_i32] = char
+        self.__cube[hashed_char][as_operator][hashed_i32] = i32
         self.__cube[hashed_char][as_operator][hashed_f64] = None
         self.__cube[hashed_char][as_operator][hashed_char] = char
         self.__cube[hashed_char][multiplication] = {}

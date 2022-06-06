@@ -43,9 +43,9 @@ class TypeCastExpression:
         """
 
         return [[
-            f'{type(self).__name__} unimplemented',
-            None,
-            None,
+            'as',
+            self.__expression.operand(),
+            self.__type.canonical(),
             self.__temporary_variable,
         ]]
 
