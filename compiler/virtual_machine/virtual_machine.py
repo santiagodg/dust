@@ -377,6 +377,10 @@ class VirtualMachine:
                             memory.put(quadruple[3], 8)
                         elif value == '9':
                             memory.put(quadruple[3], 9)
+                        else:
+                            print(
+                                f'Failed to execute type cast quadruple {quadruple} from char to i32: "{value}" cannot be converted.')
+                            sys.exit(1)
                     elif quadruple[3] % 10000 // 1000 == 3:
                         print(
                             f'Failed to execute type cast quadruple {quadruple}: char to f64 not allowed.')
