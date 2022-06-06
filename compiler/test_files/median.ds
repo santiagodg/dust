@@ -1,0 +1,129 @@
+fn digit_to_char(num: i32) -> char {
+    if num / 10 > 0 {
+        return '?';
+    };
+
+    if num == 0 {
+        return '0';
+    };
+
+    if num == 1 {
+        return '1';
+    };
+
+    if num == 2 {
+        return '2';
+    };
+
+    if num == 3 {
+        return '3';
+    };
+
+    if num == 4 {
+        return '4';
+    };
+
+    if num == 5 {
+        return '5';
+    };
+
+    if num == 6 {
+        return '6';
+    };
+
+    if num == 7 {
+        return '7';
+    };
+
+    if num == 8 {
+        return '8';
+    };
+
+    if num == 9 {
+        return '9';
+    };
+
+    return '?';
+}
+
+fn write_f64(num: f64)
+let buffer: [char; 20];
+let num_digits: i32;
+let num_i32: i32;
+let modulo: i32;
+let index: i32;
+let char_result: char;
+{
+    num_i32 = num as i32;
+    num = num - (num_i32 as f64);
+    
+    if num_i32 == 0 {
+        write('0');
+    } else {
+        if num_i32 < 0 {
+            write('-');
+            num_i32 = num_i32 * -1;
+        };
+
+        num_digits = 0;
+
+        while num_i32 > 0 && num_digits < 20 {
+            modulo = num_i32 % 10;
+            char_result = digit_to_char(modulo);
+            buffer[num_digits] = char_result;
+            num_i32 = num_i32 / 10;
+            num_digits = num_digits + 1;
+        };
+
+        index = num_digits - 1;
+
+        while index >= 0 {
+            write(buffer[index]);
+            index = index - 1;
+        };
+    };
+
+    write('.');
+
+    if num == 0.0 {
+        write('0');
+        write('\n');
+        return;
+    };
+
+    if num < 0.0 {
+        num = num * -1.0;
+    };
+
+    num_digits = 0;
+
+    while num > 0.0 && num_digits < 5 {
+        num = num * 10.0;
+        modulo = num as i32;
+        char_result = digit_to_char(modulo);
+        buffer[num_digits] = char_result;
+        num = num - (modulo as f64);
+        num_digits = num_digits + 1;
+    };
+
+    index = 0;
+
+    while index < num_digits {
+        write(buffer[index]);
+        index = index + 1;
+    };
+
+    write('\n');
+}
+
+fn main()
+let xs: [f64; 3];
+let result: f64;
+{
+    xs[0] = 1.0;
+    xs[1] = 2.0;
+    xs[2] = 7.0;
+
+    result = median(xs);
+    write_f64(result);
+}

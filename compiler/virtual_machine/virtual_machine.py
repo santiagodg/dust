@@ -466,5 +466,15 @@ class VirtualMachine:
                 memory.put(quadruple[3], value)
                 instruction_pointer += 1
                 continue
-            print(f'Failed to execute quadruple: {quadruple}')
+            if quadruple[0] == 'median':
+                xs = []
+                for i in range(quadruple[2]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                value = np.median(xs)
+                memory.put(quadruple[3], value)
+                instruction_pointer += 1
+                continue
+            print(
+                f'Failed to execute quadruple: {quadruple}. Virtual machine is not aware of this kind of quadruple.')
             sys.exit(1)
