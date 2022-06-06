@@ -38,10 +38,10 @@ class SkewnessExpression:
         """
 
         return [[
-            f'{type(self).__name__} unimplemented',
-            None,
-            None,
-            None,
+            'skewness',
+            self.__expression.operand(),
+            self.__expression.type().type().length().value(),
+            self.__temporary_variable,
         ]]
 
     def __eq__(self, other):

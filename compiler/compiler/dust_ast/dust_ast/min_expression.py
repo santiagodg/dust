@@ -4,6 +4,7 @@ from typing import Optional
 from .primitive_type import PrimitiveType
 from .dust_type import Type
 
+
 class MinExpression:
     def __init__(self, expression, temp_var_generator):
         "expression: Expression"
@@ -16,35 +17,36 @@ class MinExpression:
         space_padding: str = ' ' * padding
         space_indent: str = ' ' * indent
         result += f'MinExpression:\n'
-        expression_str: str = self.__expression.to_string(indent, padding + indent)
+        expression_str: str = self.__expression.to_string(
+            indent, padding + indent)
         result += f'{space_padding}{space_indent}expression: {expression_str}'
         return result
-    
+
     def type(self) -> Optional[Type]:
         return copy.deepcopy(self.__type)
-    
+
     def operand(self):
         """
         :rtype: TemporaryVariable | Identifier | BooleanLiteral | IntegerLiteral | FloatLiteral | CharLiteral | None
         """
 
         return self.__temporary_variable
-    
+
     def quadruples(self):
         """
         :rtype: List[Tuple[str, str, str, str]]
         """
 
         return [[
-            f'{type(self).__name__} unimplemented', 
-            None,
-            None,
+            'min',
+            self.__expression.operand(),
+            self.__expression.type().type().length().value(),
             self.__temporary_variable,
         ]]
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
-    
+
     def __repr__(self):
         return self.__str__()
 

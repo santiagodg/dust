@@ -1072,9 +1072,14 @@ class Parser():
     def p_min_expression(self, p):
         "min_expression : MIN '(' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1:
+            print(
+                f"Parameter must be array of a single dimension in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = MinExpression(p[3], self.__temp_var_generator)
@@ -1083,9 +1088,14 @@ class Parser():
     def p_max_expression(self, p):
         "max_expression : MAX '(' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1:
+            print(
+                f"Parameter must be array of a single dimension in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = MaxExpression(p[3], self.__temp_var_generator)
@@ -1094,9 +1104,14 @@ class Parser():
     def p_standard_deviation_expression(self, p):
         "standard_deviation_expression : STANDARD_DEVIATION '(' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1:
+            print(
+                f"Parameter must be array of a single dimension in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = StandardDeviationExpression(p[3], self.__temp_var_generator)
@@ -1105,9 +1120,14 @@ class Parser():
     def p_variance_expression(self, p):
         "variance_expression : VARIANCE '(' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1:
+            print(
+                f"Parameter must be array of a single dimension in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = VarianceExpression(p[3], self.__temp_var_generator)
@@ -1116,9 +1136,14 @@ class Parser():
     def p_skewness_expression(self, p):
         "skewness_expression : SKEWNESS '(' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1:
+            print(
+                f"Parameter must be array of a single dimension in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = SkewnessExpression(p[3], self.__temp_var_generator)
@@ -1127,9 +1152,14 @@ class Parser():
     def p_kurtosis_expression(self, p):
         "kurtosis_expression : KURTOSIS '(' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1:
+            print(
+                f"Parameter must be array of a single dimension in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = KurtosisExpression(p[3], self.__temp_var_generator)
@@ -1138,14 +1168,24 @@ class Parser():
     def p_r_squared_expression(self, p):
         "r_squared_expression : R_SQUARED '(' expression ',' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"First parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
-        if p[5].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[5].type().canonical() != '[f64]':
             print(
-                f"Second parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Second parameter must be of type [f64], not {p[5].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1 or len(p[5].type().type().shape()) != 1:
+            print(
+                f"Parameters must be arrays of a single dimension in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if p[3].type().type().length().value() != p[5].type().type().length().value():
+            print(
+                f'Both parameters must be arrays of same size. Parameter 1 is of length {p[3].type().type().length().value()} and parameter 2 is of length {p[5].type().type().length().value()} in line {self.lexer.lexer.lineno}')
             sys.exit(1)
 
         p[0] = RSquaredExpression(p[3], p[5], self.__temp_var_generator)
@@ -1156,7 +1196,12 @@ class Parser():
 
         if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"Parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1:
+            print(
+                f"Parameter must be array of a single dimension in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = SumExpression(p[3], self.__temp_var_generator)

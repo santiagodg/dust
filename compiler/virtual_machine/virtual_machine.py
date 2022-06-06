@@ -10,6 +10,7 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import skew, kurtosis, linregress
 
 from .memory import Memory
 
@@ -485,6 +486,82 @@ class VirtualMachine:
                     ys.append(value)
                 value = np.square(np.subtract(ys, xs)).mean()
                 memory.put(quadruple[4], value)
+                instruction_pointer += 1
+                continue
+            if quadruple[0] == 'min':
+                xs = []
+                for i in range(quadruple[2]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                value = np.min(xs)
+                memory.put(quadruple[3], value)
+                instruction_pointer += 1
+                continue
+            if quadruple[0] == 'max':
+                xs = []
+                for i in range(quadruple[2]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                value = np.max(xs)
+                memory.put(quadruple[3], value)
+                instruction_pointer += 1
+                continue
+            if quadruple[0] == 'std':
+                xs = []
+                for i in range(quadruple[2]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                value = np.std(xs)
+                memory.put(quadruple[3], value)
+                instruction_pointer += 1
+                continue
+            if quadruple[0] == 'variance':
+                xs = []
+                for i in range(quadruple[2]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                value = np.var(xs)
+                memory.put(quadruple[3], value)
+                instruction_pointer += 1
+                continue
+            if quadruple[0] == 'skewness':
+                xs = []
+                for i in range(quadruple[2]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                value = skew(xs)
+                memory.put(quadruple[3], value)
+                instruction_pointer += 1
+                continue
+            if quadruple[0] == 'kurtosis':
+                xs = []
+                for i in range(quadruple[2]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                value = kurtosis(xs)
+                memory.put(quadruple[3], value)
+                instruction_pointer += 1
+                continue
+            if quadruple[0] == 'r2':
+                xs = []
+                ys = []
+                for i in range(quadruple[3]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                    value = memory.get(quadruple[2] + i)
+                    ys.append(value)
+                _slope, _intercept, r_value, _p_value, _std_err = linregress(
+                    xs, ys)
+                memory.put(quadruple[4], r_value ** 2)
+                instruction_pointer += 1
+                continue
+            if quadruple[0] == 'sum':
+                xs = []
+                for i in range(quadruple[2]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                value = np.sum(xs)
+                memory.put(quadruple[3], value)
                 instruction_pointer += 1
                 continue
             print(
