@@ -128,6 +128,9 @@ class Memory:
                 return self.__constants['i32'][virtual_address % 1000]
             if virtual_address // 1000 == 3:
                 return self.__constants['f64'][virtual_address % 1000]
+            
+    def get_pointed_address(self, address):
+        return self.__temporaries_top['pointer'][address % 10000 % 1000]
 
     def put(self, address, value):
         """Put a value in some address.

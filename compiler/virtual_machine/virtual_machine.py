@@ -328,7 +328,8 @@ class VirtualMachine:
                 continue
             if quadruple[0] == 'as':
                 value = memory.get(quadruple[1])
-                if quadruple[1] % 10000 // 1000 == 0:
+                from_address = memory.get_pointed_address(quadruple[1])
+                if from_address % 10000 // 1000 == 0:
                     if quadruple[3] % 10000 // 1000 == 0:
                         memory.put(quadruple[3], value)
                     elif quadruple[3] % 10000 // 1000 == 1:
@@ -349,7 +350,7 @@ class VirtualMachine:
                         print(
                             f'Failed to execute type cast quadruple {quadruple}: {quadruple[3]} address could not be processed.')
                         sys.exit(1)
-                elif quadruple[1] % 10000 // 1000 == 1:
+                elif from_address % 10000 // 1000 == 1:
                     if quadruple[3] % 10000 // 1000 == 0:
                         print(
                             f'Failed to execute type cast quadruple {quadruple}: char to bool not allowed.')
@@ -389,7 +390,7 @@ class VirtualMachine:
                         print(
                             f'Failed to execute type cast quadruple {quadruple}: {quadruple[3]} address could not be processed.')
                         sys.exit(1)
-                elif quadruple[1] % 10000 // 1000 == 2:
+                elif from_address % 10000 // 1000 == 2:
                     if quadruple[3] % 10000 // 1000 == 0:
                         print(
                             f'Failed to execute type cast quadruple {quadruple}: i32 to bool not allowed.')
@@ -406,7 +407,7 @@ class VirtualMachine:
                         print(
                             f'Failed to execute type cast quadruple {quadruple}: {quadruple[3]} address could not be processed.')
                         sys.exit(1)
-                elif quadruple[1] % 10000 // 1000 == 3:
+                elif from_address % 10000 // 1000 == 3:
                     if quadruple[3] % 10000 // 1000 == 0:
                         print(
                             f'Failed to execute type cast quadruple {quadruple}: f64 to bool not allowed.')
@@ -425,7 +426,7 @@ class VirtualMachine:
                         sys.exit(1)
                 else:
                     print(
-                        f'Failed to execute type cast quadruple {quadruple}: {quadruple[1]} address could not be processed.')
+                        f'Failed to execute type cast quadruple {quadruple}: {from_address} address could not be processed.')
                     sys.exit(1)
                 instruction_pointer += 1
                 continue

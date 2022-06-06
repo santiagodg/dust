@@ -1,0 +1,122 @@
+fn factorial_recursive(num: i32) -> i32 {
+    if num < 2 {
+        return 1;
+    };
+
+    return num * factorial_recursive(num - 1);
+}
+
+fn factorial_iterative(num: i32) -> i32
+let result: i32;
+let current: i32;
+{
+    result = 1;
+    current = 1;
+
+    while current <= num {
+        result = result * current;
+        current = current + 1;
+    };
+
+    return result;
+}
+
+fn char_arr_to_i32(c: [char; 2]) -> i32 {
+    return c[0] as i32 * 10 + c[1] as i32;
+}
+
+fn digit_to_char(num: i32) -> char
+let arr: [char; 10];
+{
+    if num < 0 {
+        return '?';
+    };
+
+    if num > 9 {
+        return '?';
+    };
+
+    arr[0] = '0';
+    arr[1] = '1';
+    arr[2] = '2';
+    arr[3] = '3';
+    arr[4] = '4';
+    arr[5] = '5';
+    arr[6] = '6';
+    arr[7] = '7';
+    arr[8] = '8';
+    arr[9] = '9';
+
+    return arr[num];
+}
+
+fn write_i32(num: i32)
+let buffer: [char; 10];
+let num_digits: i32;
+let modulo: i32;
+let index: i32;
+let char_result: char;
+{
+    if num == 0 {
+        write('0');
+        write('\n');
+        return;
+    };
+
+    if num < 0 {
+        write('-');
+        num = num * -1;
+    };
+
+    num_digits = 0;
+
+    while num > 0 && num_digits < 10 {
+        modulo = num % 10;
+        char_result = digit_to_char(modulo);
+        buffer[num_digits] = char_result;
+        num = num / 10;
+        num_digits = num_digits + 1;
+    };
+
+    index = num_digits - 1;
+
+    while index >= 0 {
+        write(buffer[index]);
+        index = index - 1;
+    };
+
+    write('\n');
+}
+
+fn main()
+let input_char_arr: [char; 2];
+let input: i32;
+let result: i32;
+{
+    write('2');
+    write(' ');
+    write('d');
+    write('i');
+    write('g');
+    write('i');
+    write('t');
+    write(' ');
+    write('n');
+    write('u');
+    write('m');
+    write('b');
+    write('e');
+    write('r');
+    write(':');
+    write(' ');
+
+    read(input_char_arr[0]);
+    read(input_char_arr[1]);
+    input = char_arr_to_i32(input_char_arr);
+
+    result = factorial_recursive(input);
+    write_i32(result);
+
+    result = factorial_iterative(input);
+    write_i32(result);
+}

@@ -1,0 +1,71 @@
+fn bubble_sort(arr: [i32; 10]) -> [i32; 10]
+let i: i32;
+let j: i32;
+let temp: i32;
+{
+    i = 0;
+    while i < 9 {
+        j = 0;
+        while j < 9 - i {
+            if arr[j] > arr[j + 1] {
+                temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            };
+            j = j + 1;
+        };
+        i = i + 1;
+    };
+    return arr;
+}
+
+fn digit_to_char(num: i32) -> char
+let arr: [char; 10];
+{
+    if num < 0 {
+        return '?';
+    };
+
+    if num > 9 {
+        return '?';
+    };
+
+    arr[0] = '0';
+    arr[1] = '1';
+    arr[2] = '2';
+    arr[3] = '3';
+    arr[4] = '4';
+    arr[5] = '5';
+    arr[6] = '6';
+    arr[7] = '7';
+    arr[8] = '8';
+    arr[9] = '9';
+
+    return arr[num];
+}
+
+fn main()
+let arr: [i32; 10];
+let index: i32;
+{
+    arr[0] = 5;
+    arr[1] = 6;
+    arr[2] = 4;
+    arr[3] = 7;
+    arr[4] = 3;
+    arr[5] = 8;
+    arr[6] = 2;
+    arr[7] = 9;
+    arr[8] = 1;
+    arr[9] = 0;
+
+    arr = bubble_sort(arr);
+
+    index = 0;
+    while index < 10 {
+        write(digit_to_char(arr[index]));
+        index = index + 1;
+    };
+
+    write('\n');
+}

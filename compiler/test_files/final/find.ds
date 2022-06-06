@@ -1,0 +1,58 @@
+fn find(arr: [i32; 10], elem: i32) -> i32
+let index: i32;
+{
+    index = 0;
+    while index < 10 {
+        if arr[index] == elem {
+            return index;
+        };
+        index = index + 1;
+    };
+    return -1;
+}
+
+fn digit_to_char(num: i32) -> char
+let arr: [char; 10];
+{
+    if num < 0 {
+        return '?';
+    };
+
+    if num > 9 {
+        return '?';
+    };
+
+    arr[0] = '0';
+    arr[1] = '1';
+    arr[2] = '2';
+    arr[3] = '3';
+    arr[4] = '4';
+    arr[5] = '5';
+    arr[6] = '6';
+    arr[7] = '7';
+    arr[8] = '8';
+    arr[9] = '9';
+
+    return arr[num];
+}
+
+fn main()
+let arr: [i32; 10];
+let index: i32;
+{
+    arr[0] = 5;
+    arr[1] = 6;
+    arr[2] = 4;
+    arr[3] = 7;
+    arr[4] = 3;
+    arr[5] = 8;
+    arr[6] = 2;
+    arr[7] = 9;
+    arr[8] = 1;
+    arr[9] = 0;
+
+    index = find(arr, 2);
+
+    write(digit_to_char(index));
+    write('\n');
+}

@@ -68,7 +68,7 @@ class CallExpression:
         if self.__type is not None:
             size = 1
             if self.__type.is_array():
-                size = self.__type.type().length().value()
+                size = self.__type.type().accumulated_magnitudes()[0]
             quads.append([
                 '=',
                 self.__identifier,

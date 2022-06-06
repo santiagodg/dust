@@ -1,0 +1,67 @@
+fn digit_to_char(num: i32) -> char
+let arr: [char; 10];
+{
+    if num < 0 {
+        return '?';
+    };
+
+    if num > 9 {
+        return '?';
+    };
+
+    arr[0] = '0';
+    arr[1] = '1';
+    arr[2] = '2';
+    arr[3] = '3';
+    arr[4] = '4';
+    arr[5] = '5';
+    arr[6] = '6';
+    arr[7] = '7';
+    arr[8] = '8';
+    arr[9] = '9';
+
+    return arr[num];
+}
+
+fn write_i32(num: i32)
+let buffer: [char; 10];
+let num_digits: i32;
+let modulo: i32;
+let index: i32;
+let char_result: char;
+{
+    if num == 0 {
+        write('0');
+        return;
+    };
+
+    if num < 0 {
+        write('-');
+        num = num * -1;
+    };
+
+    num_digits = 0;
+
+    while num > 0 && num_digits < 10 {
+        modulo = num % 10;
+        char_result = digit_to_char(modulo);
+        buffer[num_digits] = char_result;
+        num = num / 10;
+        num_digits = num_digits + 1;
+    };
+
+    index = num_digits - 1;
+
+    while index >= 0 {
+        write(buffer[index]);
+        index = index - 1;
+    };
+}
+
+fn main()
+let matrix: [[i32; 5]; 5];
+{
+    matrix[0][0] = 254;
+    write_i32(matrix[1][0]);
+    write('\n');
+}

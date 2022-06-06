@@ -36,7 +36,6 @@ ExpressionWithoutBlock ::= LiteralExpression
                         | IDENTIFIER
                         | OperatorExpression
                         | GroupedExpression
-                        | ArrayExpression
                         | IndexExpression
                         | CallExpression
                         | ContinueExpression
@@ -80,11 +79,6 @@ TypeCastExpression ::= Expression 'as' Type
 AssignmentExpression ::= Expression '=' Expression
 
 GroupedExpression ::= '(' Expression ')'
-
-ArrayExpression ::= '[' ArrayElements? ']'
-
-ArrayElements ::= Expression (',' Expression)* ','?
-               | Expression ';' INTEGER_LITERAL
 
 IndexExpression ::= Expression '[' INTEGER_LITERAL ']'
 

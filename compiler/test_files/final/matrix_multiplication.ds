@@ -1,0 +1,202 @@
+fn matrix_multiplication(
+    m_1: [[i32; 3]; 3],
+    m_2: [[i32; 3]; 3]
+) -> [[i32; 3]; 3]
+let result: [[i32; 3]; 3];
+let i: i32;
+let j: i32;
+let k: i32;
+{
+    i = 0;
+    while i < 3 {
+        j = 0;
+        while j < 3 {
+            result[i][j] = 0;
+            j = j + 1;
+        };
+        i = i + 1;
+    };
+
+    i = 0;
+    while i < 3 {
+        j = 0;
+        while j < 3 {
+            k = 0;
+            while k < 3 {
+                result[i][j] = result[i][j] + m_1[i][k] * m_2[k][j];
+                k = k + 1;
+            };
+            j = j + 1;
+        };
+        i = i + 1;
+    };
+
+    return result;
+}
+
+fn digit_to_char(num: i32) -> char
+let arr: [char; 10];
+{
+    if num < 0 {
+        return '?';
+    };
+
+    if num > 9 {
+        return '?';
+    };
+
+    arr[0] = '0';
+    arr[1] = '1';
+    arr[2] = '2';
+    arr[3] = '3';
+    arr[4] = '4';
+    arr[5] = '5';
+    arr[6] = '6';
+    arr[7] = '7';
+    arr[8] = '8';
+    arr[9] = '9';
+
+    return arr[num];
+}
+
+fn write_i32(num: i32)
+let buffer: [char; 10];
+let num_digits: i32;
+let modulo: i32;
+let index: i32;
+let char_result: char;
+{
+    if num == 0 {
+        write('0');
+        return;
+    };
+
+    if num < 0 {
+        write('-');
+        num = num * -1;
+    };
+
+    num_digits = 0;
+
+    while num > 0 && num_digits < 10 {
+        modulo = num % 10;
+        char_result = digit_to_char(modulo);
+        buffer[num_digits] = char_result;
+        num = num / 10;
+        num_digits = num_digits + 1;
+    };
+
+    index = num_digits - 1;
+
+    while index >= 0 {
+        write(buffer[index]);
+        index = index - 1;
+    };
+}
+
+fn display_matrix(matrix: [[i32; 3]; 3])
+let i: i32;
+let j: i32;
+{
+    i = 0;
+    write('[');
+    while i < 2 {
+        if i != 0 {
+            write(' ');
+        };
+
+        write('[');
+        j = 0;
+        while j < 2 {
+            write_i32(matrix[i][j]);
+            write(',');
+            write(' ');
+            j = j + 1;
+        };
+        write_i32(matrix[i][j]);
+        write(']');
+        write(',');
+        write('\n');
+        i = i + 1;
+    };
+    write(' ');
+    write('[');
+    j = 0;
+    while j < 2 {
+        write_i32(matrix[i][j]);
+        write(',');
+        write(' ');
+        j = j + 1;
+    };
+    write_i32(matrix[i][j]);
+    write(']');
+    write(']');
+    write('\n');
+}
+
+fn display_input_matrices(
+    m_1: [[i32; 3]; 3],
+    m_2: [[i32; 3]; 3],
+) {
+    write('M');
+    write('a');
+    write('t');
+    write('r');
+    write('i');
+    write('x');
+    write(' ');
+    write('1');
+    write(':');
+    write('\n');
+
+    display_matrix(m_1);
+
+    write('M');
+    write('a');
+    write('t');
+    write('r');
+    write('i');
+    write('x');
+    write(' ');
+    write('2');
+    write(':');
+    write('\n');
+
+    display_matrix(m_2);
+}
+
+fn display_output_matrix(matrix: [[i32; 3]; 3]) {
+    write('R');
+    write('e');
+    write('s');
+    write('u');
+    write('l');
+    write('t');
+    write(':');
+    write('\n');
+
+    display_matrix(matrix);
+}
+
+fn main()
+let matrix_1: [[i32; 3]; 3];
+let matrix_2: [[i32; 3]; 3];
+let i: i32;
+let j: i32;
+{
+    i = 0;
+    while i < 3 {
+        j = 0;
+        while j < 3 {
+            matrix_1[i][j] = i * 3 + j;
+            matrix_2[i][j] = i * 3 + j + 1;
+            j = j + 1;
+        };
+        i = i + 1;
+    };
+
+    display_input_matrices(matrix_1, matrix_2);
+    matrix_1 = matrix_multiplication(matrix_1, matrix_2);
+    write('\n');
+    display_output_matrix(matrix_1);
+}

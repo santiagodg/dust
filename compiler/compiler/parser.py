@@ -657,8 +657,10 @@ class Parser():
             return
         if p[3].type().canonical() != 'i32':
             print(
-                f'Indexing an array with an expression of type {p[3].canonical()} is not allowed. Index parameter must be i32.')
+                f'Indexing an array with an expression of type {p[3].canonical()} is not allowed. Index parameter must be i32 in line {self.lexer.lexer.lineno}')
             sys.exit(1)
+
+        # verify indexing parameter range
         constant_0_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
             if value == 0 and isinstance(value, int):
@@ -670,9 +672,8 @@ class Parser():
             self.__constant_table[constant_0_virtual_address] = 0
         constant_upper_limit_virtual_address = None
         for virtual_address, value in self.__constant_table.items():
-            if value == self.__array_current_identifier[-1].type().type().shape()[
-                    self.__array_dimension_stack[-1] - 1] and type(value) == type(self.__array_current_identifier[-1].type().type().shape()[
-                    self.__array_dimension_stack[-1] - 1]):
+            if value == self.__array_current_identifier[-1].type().type().shape()[self.__array_dimension_stack[-1] - 1] \
+                    and type(value) == type(self.__array_current_identifier[-1].type().type().shape()[self.__array_dimension_stack[-1] - 1]):
                 constant_upper_limit_virtual_address = virtual_address
                 break
         if constant_upper_limit_virtual_address is None:
@@ -689,6 +690,8 @@ class Parser():
             ],
         )
         self.__array_temporaries.append(p[3])
+
+        # if not the last element
         if self.__array_dimension_stack[-1] < len(self.__array_current_identifier[-1].type().type().shape()):
             aux = self.__array_temporaries.pop()
             m = self.__array_current_identifier[-1].type().type().accumulated_magnitudes()[
@@ -710,25 +713,24 @@ class Parser():
                 constant_upper_limit_virtual_address,
                 copy.deepcopy(self.__array_temporaries[-1]),
             ])
+
+        # if not the first element
         if self.__array_dimension_stack[-1] > 1:
+            aux2 = self.__array_temporaries.pop()
             aux1 = self.__array_temporaries.pop()
-            aux2 = p[3].operand()
             self.__array_temporaries.append(
                 self.__temp_var_generator.next(Type(PrimitiveType('i32'))))
             if isinstance(aux1, Expression):
-                self.__quadruples.append([
-                    '+',
-                    aux1.operand(),
-                    aux2,
-                    copy.deepcopy(self.__array_temporaries[-1]),
-                ])
-            else:
-                self.__quadruples.append([
-                    '+',
-                    aux1,
-                    aux2,
-                    copy.deepcopy(self.__array_temporaries[-1]),
-                ])
+                aux1 = aux1.operand()
+            if isinstance(aux2, Expression):
+                aux2 = aux2.operand()
+            self.__quadruples.append([
+                '+',
+                aux1,
+                aux2,
+                copy.deepcopy(self.__array_temporaries[-1]),
+            ])
+
         self.__array_dimension_stack[-1] += 1
         p[1].append(p[3])
         p[0] = p[1]
