@@ -475,6 +475,18 @@ class VirtualMachine:
                 memory.put(quadruple[3], value)
                 instruction_pointer += 1
                 continue
+            if quadruple[0] == 'mse':
+                xs = []
+                ys = []
+                for i in range(quadruple[3]):
+                    value = memory.get(quadruple[1] + i)
+                    xs.append(value)
+                    value = memory.get(quadruple[2] + i)
+                    ys.append(value)
+                value = np.square(np.subtract(ys, xs)).mean()
+                memory.put(quadruple[4], value)
+                instruction_pointer += 1
+                continue
             print(
                 f'Failed to execute quadruple: {quadruple}. Virtual machine is not aware of this kind of quadruple.')
             sys.exit(1)

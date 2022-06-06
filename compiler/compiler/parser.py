@@ -1044,14 +1044,29 @@ class Parser():
         self.__quadruples += p[0].quadruples()
 
     def p_mean_square_expression(self, p):
-        "mean_square_error_expression : MEAN_SQUARE_ERROR '(' expression ')'"
+        "mean_square_error_expression : MEAN_SQUARE_ERROR '(' expression ',' expression ')'"
 
-        if p[3].type().canonical() != Type(ArrayType(Type(PrimitiveType('f64')), IntegerLiteral(3))).canonical():
+        if p[3].type().canonical() != '[f64]':
             print(
-                f"First parameter must be of type [f64] in line {self.lexer.lexer.lineno}")
+                f"First parameter must be of type [f64], not {p[3].type().canonical()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
-        p[0] = MeanSquareErrorExpression(p[3], self.__temp_var_generator)
+        if p[5].type().canonical() != '[f64]':
+            print(
+                f"Second parameter must be of type [f64], not {p[5].type().canonical()} in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if len(p[3].type().type().shape()) != 1 or len(p[5].type().type().shape()) != 1:
+            print(
+                f"Parameters must be arrays of a single dimension in line {self.lexer.lexer.lineno}")
+            sys.exit(1)
+
+        if p[3].type().type().length().value() != p[5].type().type().length().value():
+            print(
+                f'Both parameters must be arrays of same size. Parameter 1 is of length {p[3].type().type().length().value()} and parameter 2 is of length {p[5].type().type().length().value()} in line {self.lexer.lexer.lineno}')
+            sys.exit(1)
+
+        p[0] = MeanSquareErrorExpression(p[3], p[5], self.__temp_var_generator)
         self.__quadruples += p[0].quadruples()
 
     def p_min_expression(self, p):

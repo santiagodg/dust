@@ -11,7 +11,7 @@ def quadruples_to_dict(quadruples):
     result = []
     for quadruple in quadruples:
         subresult = [quadruple[0]]
-        for i in range(1, 4):
+        for i in range(1, len(quadruple)):
             if quadruple[i] is None:
                 subresult.append(None)
                 continue
