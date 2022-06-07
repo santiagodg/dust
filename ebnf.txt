@@ -38,8 +38,6 @@ ExpressionWithoutBlock ::= LiteralExpression
                         | GroupedExpression
                         | IndexExpression
                         | CallExpression
-                        | ContinueExpression
-                        | BreakExpression
                         | ReturnExpression
                         | SpecialFunctionExpression
 
@@ -85,10 +83,6 @@ IndexExpression ::= Expression '[' INTEGER_LITERAL ']'
 CallExpression ::= IDENTIFIER '(' CallParams? ')'
 
 CallParams ::= Expression (',' Expression)* ','?
-
-ContinueExpression ::= 'continue'
-
-BreakExpression ::= 'break'
 
 ReturnExpression ::= 'return' Expression?
 

@@ -27,9 +27,7 @@ class Lexer:
     reserved = {
         'as': 'AS',
         'bool': 'BOOL',
-        'break': 'BREAK',
         'char': 'CHAR',
-        'continue': 'CONTINUE',
         'else': 'ELSE',
         'f64': 'F64',
         'fn': 'FN',

@@ -120,7 +120,7 @@ class Parser():
     tokens = Lexer().tokens
 
     precedence = (
-        ('right', 'RETURN', 'BREAK'),
+        ('right', 'RETURN'),
         ('left', 'OR'),
         ('left', 'AND'),
         ('left', 'EQ', 'NE', '<', '>', 'LE', 'GE'),
@@ -164,7 +164,8 @@ class Parser():
     def p_static_item_check_id(self, p):
         "static_item_check_id :"
         if self.__dir_func.exists(p[-1]):
-            print(f"Multiple declaration: identifier '{p[-1].identifier()}'")
+            print(
+                f"Multiple declaration: static item '{p[-1].identifier()}' in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
     def p_function(self, p):
@@ -276,7 +277,7 @@ class Parser():
 
         if id_exists:
             print(
-                f"Multiple declaration: parameter identifier '{p[-1].identifier()}' in function '{self.__temp_function_identifier.identifier()}' in line {self.lexer.lexer.lineno}")
+                f"Multiple declaration: parameter '{p[-1].identifier()}' in function '{self.__temp_function_identifier.identifier()}' in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
     def p_function_return_type(self, p):
@@ -341,11 +342,8 @@ class Parser():
         """expression_without_block : literal_expression
                                     | operator_expression
                                     | grouped_expression
-                                    | array_expression
                                     | index_expression
                                     | call_expression
-                                    | continue_expression
-                                    | break_expression
                                     | return_expression
                                     | special_function_expression"""
 
@@ -542,41 +540,41 @@ class Parser():
         "grouped_expression : '(' expression ')'"
         p[0] = GroupedExpression(p[2])
 
-    def p_array_expression_not_empty(self, p):
-        """array_expression : '[' array_elements_literal ']'
-                            | '[' array_elements_repeat ']'"""
-        p[0] = ArrayExpression(p[2], self.__temp_var_generator)
-        self.__quadruples += p[0].quadruples()
+    # def p_array_expression_not_empty(self, p):
+    #     """array_expression : '[' array_elements_literal ']'
+    #                         | '[' array_elements_repeat ']'"""
+    #     p[0] = ArrayExpression(p[2], self.__temp_var_generator)
+    #     self.__quadruples += p[0].quadruples()
 
-    def p_array_expression_empty(self, p):
-        "array_expression : '[' empty ']'"
-        p[0] = ArrayExpression([], self.__temp_var_generator)
-        self.__quadruples += p[0].quadruples()
+    # def p_array_expression_empty(self, p):
+    #     "array_expression : '[' empty ']'"
+    #     p[0] = ArrayExpression([], self.__temp_var_generator)
+    #     self.__quadruples += p[0].quadruples()
 
-    def p_array_elements_literal(self, p):
-        """array_elements_literal : array_elements_literal ',' expression
-                                  | expression"""
+    # def p_array_elements_literal(self, p):
+    #     """array_elements_literal : array_elements_literal ',' expression
+    #                               | expression"""
 
-        if len(p) == 2:
-            self.__temp_array_elements_literal_type = p[1].type()
-            p[0] = [p[1]]
-        else:
-            if p[3].type() != self.__temp_array_elements_literal_type:
-                print(
-                    f"Cannot add expression of type {p[3].type().canonical()} to literal array expression of type {self.__temp_array_elements_literal_type} in line {self.lexer.lexer.lineno}")
-                sys.exit(1)
+    #     if len(p) == 2:
+    #         self.__temp_array_elements_literal_type = p[1].type()
+    #         p[0] = [p[1]]
+    #     else:
+    #         if p[3].type() != self.__temp_array_elements_literal_type:
+    #             print(
+    #                 f"Cannot add expression of type {p[3].type().canonical()} to literal array expression of type {self.__temp_array_elements_literal_type} in line {self.lexer.lexer.lineno}")
+    #             sys.exit(1)
 
-            p[0] = p[1] + [p[3]]
+    #         p[0] = p[1] + [p[3]]
 
-    def p_array_elements_repeat(self, p):
-        "array_elements_repeat : expression ';' INTEGER_LITERAL"
-        length = p[3].value()
-        result = []
+    # def p_array_elements_repeat(self, p):
+    #     "array_elements_repeat : expression ';' INTEGER_LITERAL"
+    #     length = p[3].value()
+    #     result = []
 
-        for _ in range(length):
-            result += [copy.deepcopy(p[1])]
+    #     for _ in range(length):
+    #         result += [copy.deepcopy(p[1])]
 
-        p[0] = result
+    #     p[0] = result
 
     def p_index_expression(self, p):
         "index_expression : IDENTIFIER index_expression_point_1 index_parameters"
@@ -640,11 +638,11 @@ class Parser():
             self.__temp_function_identifier, p[-1])
         if typed_identifier is None:
             print(
-                f"Use of undeclared identifier '{p[-1].identifier()}' in line {self.lexer.lexer.lineno}")
+                f"Use of undeclared identifier '{typed_identifier.identifier()}' in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         if not typed_identifier.type().is_array():
             print(
-                f"Cannot perform indexing for identifier '{p[-1].identifier()}' of type {p[-1].type().canonical()} in line {self.lexer.lexer.lineno}")
+                f"Cannot perform indexing for identifier '{typed_identifier.identifier()}' of type {typed_identifier.type().canonical()} in line {self.lexer.lexer.lineno}")
             sys.exit(1)
         self.__array_dimension_stack.append(1)
         self.__array_current_identifier.append(typed_identifier)
@@ -657,7 +655,7 @@ class Parser():
             return
         if p[3].type().canonical() != 'i32':
             print(
-                f'Indexing an array with an expression of type {p[3].canonical()} is not allowed. Index parameter must be i32 in line {self.lexer.lexer.lineno}')
+                f'Indexing an array with an expression of type {p[3].type().canonical()} is not allowed. Index parameter must be i32 in line {self.lexer.lexer.lineno}')
             sys.exit(1)
 
         # verify indexing parameter range
@@ -764,6 +762,7 @@ class Parser():
                 p[1], p[4], self.__dir_func, self.__temp_var_generator)
 
         self.__quadruples += p[0].quadruples()
+        self.__call_parameter_count.pop()
 
     def p_call_expression_point_1(self, p):
         'call_expression_point_1 :'
@@ -779,14 +778,13 @@ class Parser():
             None,
             None,
         ])
+        self.__call_parameter_count.append(1)
 
     def p_call_params(self, p):
         """call_params : call_params ',' expression
                        | expression"""
 
         if len(p) == 2:
-            self.__call_parameter_count = 1
-
             size = 1
             if p[1].type().is_array():
                 size = p[1].type().type().accumulated_magnitudes()[0]
@@ -794,12 +792,12 @@ class Parser():
                 'Parameter',
                 p[1].operand(),
                 size,
-                self.__call_parameter_count
+                self.__call_parameter_count[-1]
             ])
 
             p[0] = [p[1]]
         else:
-            self.__call_parameter_count += 1
+            self.__call_parameter_count[-1] += 1
 
             size = 1
             if p[3].type().is_array():
@@ -808,20 +806,20 @@ class Parser():
                 'Parameter',
                 p[3].operand(),
                 size,
-                self.__call_parameter_count
+                self.__call_parameter_count[-1]
             ])
 
             p[0] = p[1] + [p[3]]
 
-    def p_continue_expression(self, p):
-        "continue_expression : CONTINUE"
-        p[0] = ContinueExpression()
-        self.__quadruples += p[0].quadruples()
+    # def p_continue_expression(self, p):
+    #     "continue_expression : CONTINUE"
+    #     p[0] = ContinueExpression()
+    #     self.__quadruples += p[0].quadruples()
 
-    def p_break_expression(self, p):
-        "break_expression : BREAK"
-        p[0] = BreakExpression()
-        self.__quadruples += p[0].quadruples()
+    # def p_break_expression(self, p):
+    #     "break_expression : BREAK"
+    #     p[0] = BreakExpression()
+    #     self.__quadruples += p[0].quadruples()
 
     def p_return_expression(self, p):
         "return_expression : RETURN expression"
@@ -868,9 +866,9 @@ class Parser():
         if frt != None:
             function_return_type = Type(frt)
 
-        if function_return_type != None:
+        if function_return_type is not None:
             print(
-                f'Returning nothing from a function with return type {function_return_type} is not allowed. Line {self.lexer.lexer.lineno}')
+                f'Returning nothing from a function with return type {function_return_type.canonical()} is not allowed. Line {self.lexer.lexer.lineno}')
             sys.exit(1)
 
         p[0] = ReturnExpression(None)
@@ -1237,7 +1235,8 @@ class Parser():
         "predicate_loop_expression : WHILE predicate_loop_expression_point_1 expression predicate_loop_expression_point_2 block_expression predicate_loop_expression_point_3"
 
         if p[3].type() != Type(PrimitiveType('bool')):
-            print(f"While condition must evaluate to bool")
+            print(
+                f"While condition must evaluate to bool in line {self.lexer.lexer.lineno}")
             sys.exit(1)
 
         p[0] = PredicateLoopExpression(p[3], p[5])
@@ -1371,6 +1370,7 @@ class Parser():
         self.__array_dimension_stack = []
         self.__array_current_identifier = []
         self.__array_temporaries = []
+        self.__call_parameter_count = []
         self.parser = yacc.yacc(module=self, **kwargs)
 
     def restart(self):

@@ -1,0 +1,5 @@
+fn function_1(a: i32, b: char) {}
+
+fn main() {
+    function_1('g', 12);
+}

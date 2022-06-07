@@ -1,0 +1,4 @@
+static a: i32;
+static a: i32;
+
+fn main() {}

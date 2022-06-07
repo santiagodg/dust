@@ -106,11 +106,7 @@ let char_result: char;
     write('\n');
 }
 
-fn main()
-let input_char_arr: [char; 2];
-let input: i32;
-let result: i32;
-{
+fn write_prompt() {
     write('2');
     write(' ');
     write('d');
@@ -127,7 +123,14 @@ let result: i32;
     write('r');
     write(':');
     write(' ');
+}
 
+fn main()
+let input_char_arr: [char; 2];
+let input: i32;
+let result: i32;
+{
+    write_prompt();
     read(input_char_arr[0]);
     read(input_char_arr[1]);
     input = char_arr_to_i32(input_char_arr);

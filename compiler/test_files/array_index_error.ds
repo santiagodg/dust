@@ -1,0 +1,5 @@
+fn main()
+let matrix: [[i32; 3]; 3];
+{
+    matrix[0];
+}
