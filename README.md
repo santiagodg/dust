@@ -12,18 +12,11 @@ Compile a file.
 
 ```
 cd compiler
-python3 main.py test_files/normal.ds
+py compile.py test_files/final/matrix_multiplication.ds matrix_multiplication.dso
 ```
 
-Compile from stdin. Enter Ctrl+Z on Windows or Ctrl+D on Mac and Linux to enter EOF and start compilation.
+Execute object file.
 
 ```
-cd compiler
-python3 main.py -
-fn main
-let character: char;
-{
-    character = 'a';
-    write(character);
-}
+py execute.py matrix_multiplication.dso
 ```
