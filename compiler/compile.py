@@ -62,6 +62,8 @@ def main():
             source_code = file.read()
 
     _result = c.test(source_code)
+    # print(result.to_string())
+
     obj_file_to_save = ObjFile(
         constant_table=constant_table,
         globals_table=dir_func.globals_table(),

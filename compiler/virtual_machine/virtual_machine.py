@@ -328,7 +328,9 @@ class VirtualMachine:
                 continue
             if quadruple[0] == 'as':
                 value = memory.get(quadruple[1])
-                from_address = memory.get_pointed_address(quadruple[1])
+                from_address = quadruple[1]
+                if quadruple[1] // 10000 == 3 and quadruple[1] % 10000 // 1000 == 4:
+                    from_address = memory.get_pointed_address(quadruple[1])
                 if from_address % 10000 // 1000 == 0:
                     if quadruple[3] % 10000 // 1000 == 0:
                         memory.put(quadruple[3], value)
@@ -380,7 +382,7 @@ class VirtualMachine:
                             memory.put(quadruple[3], 9)
                         else:
                             print(
-                                f'Failed to execute type cast quadruple {quadruple} from char to i32: "{value}" cannot be converted.')
+                                f"Failed to execute type cast quadruple {quadruple} from char to i32: '{value}' cannot be converted.")
                             sys.exit(1)
                     elif quadruple[3] % 10000 // 1000 == 3:
                         print(

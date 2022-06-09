@@ -1,12 +1,13 @@
 from .item import Item
 
+
 class Crate:
     def __init__(self, items: list[Item]):
         self.__items: list[Item] = items
-    
+
     def add_item(self, item: Item):
         self.__items.append(item)
-    
+
     def to_string(self, indent: int = 2, padding: int = 0) -> str:
         result: str = ''
         space_padding: str = ' ' * padding
@@ -21,14 +22,14 @@ class Crate:
             for item in self.__items:
                 item_str: str = item.to_string(indent, padding + indent * 2)
                 result += f'{space_padding}{space_indent}{space_indent}{item_str}\n'
-            
+
             result += f'{space_padding}{space_indent}]'
-        
+
         return result
 
-    def __eq__(self, other) : 
+    def __eq__(self, other):
         return self.__dict__ == other.__dict__
-    
+
     def __repr__(self):
         return self.__str__()
 

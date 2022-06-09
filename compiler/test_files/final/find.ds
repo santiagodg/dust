@@ -51,7 +51,7 @@ let index: i32;
     arr[8] = 1;
     arr[9] = 0;
 
-    index = find(arr, 2);
+    index = find(arr, 19);
 
     write(digit_to_char(index));
     write('\n');

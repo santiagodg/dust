@@ -328,7 +328,11 @@ class SemanticCube:
         self.__cube[hashed_char][or_operator][hashed_f64] = None
         self.__cube[hashed_char][or_operator][hashed_char] = None
 
-    def search_binary_operation(self, left_type: PrimitiveType, operator: str, right_type: PrimitiveType) -> Optional[PrimitiveType]:
+    def search_binary_operation(self,
+                                left_type: PrimitiveType,
+                                operator: str,
+                                right_type: PrimitiveType
+                                ) -> Optional[PrimitiveType]:
         return self.__cube[hash(left_type)][operator][hash(right_type)]
 
     def search_unary_operation(self, operator: str, type: PrimitiveType) -> Optional[PrimitiveType]:
