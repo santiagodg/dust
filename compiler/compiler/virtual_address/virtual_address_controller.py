@@ -26,48 +26,14 @@ class VirtualAddressControllerInterface(ABC):
     start_local_scope(self):
         Start a scope with new local and temporary addresses.
 
-        Panics
-        ------
-        If this method is called twice without ending the local scope in between.
-
     get_local_scope_counter(self):
         Return local scope counter.
-
-        Returns
-        -------
-        local_scope_counter : Dict[str, int]
-            A dictionary containing the amount of local variables used
-            in a function for each data type.
-
-            Example
-            -------
-            {
-                'bool': 3,
-                'char': 55,
-                'i32': 12,
-                'f64': 15,
-            }
 
     end_local_scope(self):
         End the current local scope.
 
-        Panics
-        ------
-        If this method is called twice without starting the local scope in between.
-
     acquire(self, scope, addr_type, size):
         Acquire a virtual address with specified scope and type.
-
-        Parameters
-        ----------
-        scope : Scope
-            The scope of the virtual address.
-
-        addr_type : Type
-            The type of the virtual address.
-
-        size : int, default = 1
-            The amount of addresses to acquire.
     """
 
     @abstractmethod
